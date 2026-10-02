@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Food Maker</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Babel for in-browser JSX compilation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Space+Grotesk:wght@400;600;700&display=swap');
+        
+        .font-tiempos { font-family: 'Merriweather', serif; }
+        .font-styrene { font-family: 'Space Grotesk', sans-serif; }
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            background-color: #FAF8F5;
+            overscroll-behavior-y: none;
+        }
+        
+        /* Custom scrollbar hiding for clean UI */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div id="root" class="h-full w-full"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const initialAppData = {
+          menu: [
+            {
+              id: "snacks", name: "Snacks", icon: <i className="fa-solid fa-candy-cane w-5 h-5 flex items-center justify-center text-lg"></i>,
+              subcategories: [
+                {
+                  id: "br-snacks", name: "Brazilian Snacks",
+                  foods: [{ id: "pao-de-queijo", name: "Pão de Queijo" }]
+                }
+              ]
+            },
+            { id: "bread", name: "Bread", icon: <i className="fa-solid fa-wheat-awn w-5 h-5 flex items-center justify-center text-lg"></i>, subcategories: [] },
+            { id: "chicken", name: "Chicken", icon: <i className="fa-solid fa-drumstick-bite w-5 h-5 flex items-center justify-center text-lg"></i>, subcategories: [] },
+            { id: "pasta", name: "Pasta", icon: <i className="fa-solid fa-water w-5 h-5 flex items-center justify-center text-lg"></i>, subcategories: [] },
+            { id: "veggies", name: "Veggies", icon: <i className="fa-solid fa-leaf w-5 h-5 flex items-center justify-center text-lg"></i>, subcategories: [] },
+            { id: "desserts", name: "Desserts", icon: <i className="fa-solid fa-cake-candles w-5 h-5 flex items-center justify-center text-lg"></i>, subcategories: [] },
+            { id: "bbq", name: "BBQ", icon: <i className="fa-solid fa-fire-burner w-5 h-5 flex items-center justify-center text-lg"></i>, subcategories: [] },
+            { id: "drinks", name: "Drinks", icon: <i className="fa-solid fa-glass-water w-5 h-5 flex items-center justify-center text-lg"></i>, subcategories: [] },
+            { id: "seafood", name: "Seafood", icon: <i className="fa-solid fa-fish w-5 h-5 flex items-center justify-center text-lg"></i>, subcategories: [] },
+          ],
+          latestUpdates: [
+            { 
+              id: '1', type: 'food', foodId: 'pao-de-queijo', title: 'Pão de Queijo', category: 'Brazilian Snacks', bg: 'from-amber-100 to-orange-100' 
+            },
+            { id: '2', type: 'placeholder', title: 'Coming Soon', bg: 'from-stone-200 to-stone-300' },
+            { id: '3', type: 'placeholder', title: 'Coming Soon', bg: 'from-stone-200 to-stone-300' },
+            { id: '4', type: 'placeholder', title: 'Coming Soon', bg: 'from-stone-200 to-stone-300' },
+            { id: '5', type: 'placeholder', title: 'Coming Soon', bg: 'from-stone-200 to-stone-300' },
+            { id: '6', type: 'placeholder', title: 'Coming Soon', bg: 'from-stone-200 to-stone-300' },
+            { id: '7', type: 'placeholder', title: 'Coming Soon', bg: 'from-stone-200 to-stone-300' },
+            { id: '8', type: 'placeholder', title: 'Coming Soon', bg: 'from-stone-200 to-stone-300' },
+          ],
+          trash: [],
+          recipes: {
+            "pao-de-queijo": {
+              id: "pao-de-queijo",
+              name: "Pão de Queijo",
+              isCustom: false,
+              variations: [
+                {
+                  id: "tradicional",
+                  name: "Traditional",
+                  description: "The classic recipe baked in little balls.",
+                  bg: 'from-amber-100 to-orange-50',
+                  baseYield: 30,
+                  yieldUnit: "balls",
+                  ingredients: [
+                    { id: "polvilho", name: "Tapioca Flour (Polvilho)", baseAmount: 340, unit: "g", volAmount: 2.5, volUnit: "cups" },
+                    { id: "sal", name: "Salt", baseAmount: 12, unit: "g", volAmount: 2, volUnit: "tsp" },
+                    { id: "leite", name: "Milk", baseAmount: 230, unit: "g", volAmount: 1, volUnit: "cup" },
+                    { id: "oleo", name: "Oil", baseAmount: 64, unit: "g", volAmount: 0.3, volUnit: "cup" },
+                    { id: "queijo", name: "Cheese", baseAmount: 150, unit: "g", volAmount: 1.5, volUnit: "cups" },
+                    { id: "ovo", name: "Egg(s)", baseAmount: 2, unit: "units", volAmount: 2, volUnit: "units" },
+                  ],
+                  steps: [
+                    "Mix the salt with the tapioca flour.",
+                    "Boil the milk and oil together.",
+                    "Pour the hot mixture over the tapioca flour and mix.",
+                    "Wait for it to cool down a bit.",
+                    "Add the cheese and mix until a homogeneous dough forms.",
+                    "Add the eggs, one at a time.",
+                    "Shape the cheese balls.",
+                    "Bake until golden."
+                  ]
+                },
+                {
+                  id: "crio",
+                  name: "Crio",
+                  description: "Baked in a tray and cut into little squares.",
+                  bg: 'from-stone-100 to-stone-200',
+                  baseYield: 60,
+                  yieldUnit: "squares",
+                  ingredients: [
+                    { id: "polvilho-azedo", name: "Sour Tapioca Flour", baseAmount: 440, unit: "g", volAmount: 3.5, volUnit: "cups" },
+                    { id: "polvilho-doce", name: "Sweet Tapioca Flour", baseAmount: 220, unit: "g", volAmount: 1.75, volUnit: "cups" },
+                    { id: "queijo-cura", name: "Half-cured cheese (grated)", baseAmount: 540, unit: "g", volAmount: 5, volUnit: "cups" },
+                    { id: "leite-integral", name: "Whole Milk", baseAmount: 560, unit: "g", volAmount: 2.3, volUnit: "cups" },
+                    { id: "manteiga", name: "Butter", baseAmount: 100, unit: "g", volAmount: 7, volUnit: "tbsp" },
+                    { id: "sal", name: "Salt", baseAmount: 26, unit: "g", volAmount: 1.5, volUnit: "tbsp" },
+                    { id: "ovo", name: "Egg(s)", baseAmount: 2, unit: "units", volAmount: 2, volUnit: "units" },
+                  ],
+                  steps: [
+                    "Heat milk and butter.",
+                    "Pour over tapioca flour with salt.",
+                    "Add half of the cheese and mix well.",
+                    "Add the egg and mix until fully incorporated.",
+                    "Add the rest of the cheese and mix.",
+                    "In a baking pan, level the dough and cut into squares.",
+                    "Bake for ~30min until it rises and is golden."
+                  ]
+                }
+              ]
+            }
+          }
+        };
+
+        const CustomAlert = ({ message, onClose }) => {
+          if (!message) return null;
+          return (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
+              <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-sm w-full transform transition-all text-center" onClick={e => e.stopPropagation()}>
+                <h3 className="font-styrene text-xl font-bold text-stone-800 mb-2">Notice</h3>
+                <p className="font-tiempos text-stone-600 mb-6">{message}</p>
+                <button onClick={onClose} className="w-full bg-amber-100 text-amber-800 font-styrene font-bold py-3 rounded-xl active:scale-95 transition-transform">
+                  Got it
+                </button>
+              </div>
+            </div>
+          );
+        };
+
+        const Header = ({ onMenuClick, onBack, view, title, isFavourite, toggleFavourite, isQueued, toggleQueue, onShare }) => (
+          <header className="h-16 shrink-0 flex items-center justify-between px-4 bg-[#FAF8F5] z-10 relative">
+            <div className="flex items-center gap-3">
+              {view !== 'home' ? (
+                <button onClick={onBack} className="p-2 -ml-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors">
+                  <i className="fa-solid fa-arrow-left text-xl text-stone-700"></i>
+                </button>
+              ) : (
+                <button onClick={onMenuClick} className="p-2 -ml-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors">
+                  <i className="fa-solid fa-bars text-xl text-stone-700"></i>
+                </button>
+              )}
+              <h1 className="text-xl font-styrene font-bold text-stone-800 tracking-tight line-clamp-1">
+                {view === 'home' ? 'Food Maker' : title}
+              </h1>
+            </div>
+            <div className="flex items-center gap-1">
+              {view === 'home' && (
+                <button className="p-2 -mr-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors">
+                  <i className="fa-solid fa-magnifying-glass text-xl text-stone-700"></i>
+                </button>
+              )}
+              {view === 'recipe' && (
+                <>
+                  {navigator.share && (
+                    <button onClick={onShare} className="p-2 -mr-1 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors" title="Share Recipe">
+                      <i className="fa-solid fa-arrow-up-from-bracket text-xl text-stone-400 hover:text-stone-700"></i>
+                    </button>
+                  )}
+                  <button onClick={toggleQueue} className="p-2 -mr-1 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors" title="Add to Up Next">
+                    <i className={`fa-solid fa-list-check text-xl ${isQueued ? 'text-amber-500' : 'text-stone-400 hover:text-amber-500'}`}></i>
+                  </button>
+                  <button onClick={toggleFavourite} className="p-2 -mr-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors" title="Add to Favourites">
+                    <i className={`fa-solid fa-heart text-xl ${isFavourite ? 'text-rose-500' : 'text-stone-400 hover:text-rose-500'}`}></i>
+                  </button>
+                </>
+              )}
+            </div>
+          </header>
+        );
+
+        const SideMenu = ({ isOpen, onClose, onSelectFood, onOpenFavourites, onOpenQueue, onOpenCreate, onOpenTrash, onOpenSettings, menuData }) => {
+          const [menuPath, setMenuPath] = useState([]); 
+
+          useEffect(() => {
+            if (!isOpen) setTimeout(() => setMenuPath([]), 300);
+          }, [isOpen]);
+
+          const handleBack = () => setMenuPath(prev => prev.slice(0, -1));
+
+          const renderContent = () => {
+            if (menuPath.length === 0) {
+              return (
+                <div className="flex flex-col h-full bg-[#FAF8F5]">
+                  <div className="px-6 py-4 flex items-center justify-between border-b border-stone-200">
+                    <h2 className="text-2xl font-styrene font-extrabold text-stone-800 tracking-tight">Menu</h2>
+                    <button onClick={onClose} className="p-2 -mr-2 rounded-full hover:bg-stone-200"><i className="fa-solid fa-xmark text-xl text-stone-500"></i></button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto py-2 font-tiempos">
+                    <div className="px-4 mb-2 mt-1">
+                      <div className="flex items-center gap-3 bg-white shadow-sm border border-stone-200 p-2.5 rounded-xl text-stone-400">
+                        <i className="fa-solid fa-magnifying-glass w-5 h-5 flex items-center justify-center"></i>
+                        <span className="text-sm font-medium">Search recipes...</span>
+                      </div>
+                    </div>
+                    
+                    <button onClick={() => { onOpenFavourites(); onClose(); }} className="w-full flex items-center gap-4 px-6 py-1.5 hover:bg-white active:bg-stone-100 transition-colors text-left group">
+                      <i className="fa-solid fa-heart w-5 h-5 flex items-center justify-center text-stone-400 group-hover:text-rose-500 transition-colors"></i>
+                      <span className="font-semibold text-stone-700 text-[1.05rem] flex-1">My Favourites</span>
+                    </button>
+                    
+                    <button onClick={() => { onOpenQueue(); onClose(); }} className="w-full flex items-center gap-4 px-6 py-1.5 hover:bg-white active:bg-stone-100 transition-colors text-left group">
+                      <i className="fa-solid fa-list-check w-5 h-5 flex items-center justify-center text-stone-400 group-hover:text-amber-500 transition-colors"></i>
+                      <span className="font-semibold text-stone-700 text-[1.05rem] flex-1">Up Next</span>
+                    </button>
+
+                    <button onClick={() => { onOpenCreate(); onClose(); }} className="w-full flex items-center gap-4 px-6 py-1.5 hover:bg-white active:bg-stone-100 transition-colors text-left group">
+                      <i className="fa-solid fa-plus w-5 h-5 flex items-center justify-center text-stone-400 group-hover:text-amber-500 transition-colors"></i>
+                      <span className="font-semibold text-stone-700 text-[1.05rem] flex-1">Create Recipe</span>
+                    </button>
+
+                    <div className="w-full h-px bg-stone-200 my-2"></div>
+                    
+                    <button onClick={() => { onOpenTrash(); onClose(); }} className="w-full flex items-center gap-4 px-6 py-1.5 hover:bg-white active:bg-stone-100 transition-colors text-left group">
+                      <i className="fa-solid fa-trash w-5 h-5 flex items-center justify-center text-stone-400 group-hover:text-rose-500 transition-colors"></i>
+                      <span className="font-semibold text-stone-700 text-[1.05rem] flex-1">Trash</span>
+                    </button>
+                    
+                    <button onClick={() => { onOpenSettings(); onClose(); }} className="w-full flex items-center gap-4 px-6 py-1.5 hover:bg-white active:bg-stone-100 transition-colors text-left group">
+                      <i className="fa-solid fa-gear w-5 h-5 flex items-center justify-center text-stone-400 group-hover:text-amber-500 transition-colors"></i>
+                      <span className="font-semibold text-stone-700 text-[1.05rem] flex-1">Settings & Data</span>
+                    </button>
+
+                    <div className="w-full h-px bg-stone-200 my-2"></div>
+                    <h3 className="px-6 py-1 text-xs font-bold uppercase tracking-wider text-stone-400 font-styrene">Categories</h3>
+                    {menuData.map(cat => (
+                      <button key={cat.id} onClick={() => setMenuPath([cat.id])} className="w-full flex items-center gap-4 px-6 py-2 hover:bg-white active:bg-stone-100 transition-colors text-left">
+                        <div className="text-amber-500">{cat.icon}</div>
+                        <span className="font-semibold text-stone-700 text-[1.05rem] flex-1">{cat.name}</span>
+                        <i className="fa-solid fa-chevron-right text-sm text-stone-300"></i>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+            
+            if (menuPath.length === 1) {
+              const cat = menuData.find(c => c.id === menuPath[0]);
+              return (
+                <div className="flex flex-col h-full bg-[#FAF8F5]">
+                  <div className="px-4 py-4 flex items-center gap-3 border-b border-stone-200">
+                    <button onClick={handleBack} className="p-2 -ml-2 rounded-full hover:bg-stone-200"><i className="fa-solid fa-arrow-left text-xl text-stone-600"></i></button>
+                    <h2 className="text-xl font-styrene font-bold text-stone-800 tracking-tight">{cat.name}</h2>
+                  </div>
+                  <div className="flex-1 overflow-y-auto py-2 font-tiempos">
+                    {cat.subcategories.length === 0 && <p className="px-6 py-4 text-stone-500 font-medium text-sm">More coming soon...</p>}
+                    {cat.subcategories.map(sub => (
+                      <button key={sub.id} onClick={() => setMenuPath([...menuPath, sub.id])} className="w-full flex items-center gap-4 px-6 py-3 hover:bg-white active:bg-stone-100 transition-colors text-left">
+                        <span className="font-semibold text-stone-700 text-lg flex-1">{sub.name}</span>
+                        <i className="fa-solid fa-chevron-right text-sm text-stone-300"></i>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+            
+            if (menuPath.length === 2) {
+              const cat = menuData.find(c => c.id === menuPath[0]);
+              const sub = cat.subcategories.find(s => s.id === menuPath[1]);
+              return (
+                <div className="flex flex-col h-full bg-[#FAF8F5]">
+                  <div className="px-4 py-4 flex items-center gap-3 border-b border-stone-200">
+                    <button onClick={handleBack} className="p-2 -ml-2 rounded-full hover:bg-stone-200"><i className="fa-solid fa-arrow-left text-xl text-stone-600"></i></button>
+                    <h2 className="text-xl font-styrene font-bold text-stone-800 tracking-tight line-clamp-1">{sub.name}</h2>
+                  </div>
+                  <div className="flex-1 overflow-y-auto py-2 font-tiempos">
+                    {sub.foods.map(food => (
+                      <button key={food.id} onClick={() => { onSelectFood(food.id); onClose(); }} className="w-full flex items-center gap-4 px-6 py-3 hover:bg-white active:bg-stone-100 transition-colors text-left">
+                        <span className="font-semibold text-stone-700 text-lg flex-1">{food.name}</span>
+                        <i className="fa-solid fa-chevron-right text-sm text-stone-300"></i>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+          };
+
+          return (
+            <React.Fragment>
+              {isOpen && <div className="fixed inset-0 bg-stone-900/40 z-40 backdrop-blur-sm transition-opacity" onClick={onClose} />}
+              <div className={`fixed inset-y-0 left-0 w-[85%] max-w-sm bg-white z-50 transform transition-transform duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${isOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl`}>
+                {renderContent()}
+              </div>
+            </React.Fragment>
+          );
+        };
+
+        const HomeView = ({ onSelectFood, latestUpdates }) => (
+          <div className="h-full px-4 pb-4 overflow-hidden flex flex-col">
+            <h2 className="text-2xl font-styrene font-extrabold text-stone-800 tracking-tight mb-4 shrink-0">Discover</h2>
+            <div className="flex-1 grid grid-cols-2 grid-rows-4 gap-3">
+              {latestUpdates.map(item => (
+                <button
+                  key={item.id}
+                  onClick={() => item.type === 'food' ? onSelectFood(item.foodId) : null}
+                  style={item.image ? { backgroundImage: `url('${item.image}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+                  className={`relative rounded-[1.25rem] overflow-hidden flex flex-col items-start justify-end p-4 text-left transition-transform active:scale-95 ${
+                    item.type === 'placeholder' ? 'bg-stone-200' : (item.image ? 'shadow-md' : `bg-gradient-to-br ${item.bg} shadow-sm border border-stone-100`)
+                  }`}
+                >
+                  {item.image && <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-0" />}
+                  {item.type === 'food' && !item.image && (
+                     <div className="absolute top-3 right-3 bg-white/50 p-2 rounded-full backdrop-blur-sm shadow-sm border border-white/50">
+                        <i className="fa-solid fa-utensils text-amber-600/70 w-5 h-5 flex items-center justify-center"></i>
+                     </div>
+                  )}
+                  <span className={`font-styrene font-bold text-[1.1rem] leading-tight z-10 ${item.type === 'placeholder' ? 'text-stone-400' : (item.image ? 'text-white drop-shadow-sm' : 'text-stone-800')}`}>
+                    {item.title}
+                  </span>
+                  {item.category && (
+                    <span className={`font-tiempos text-xs mt-0.5 font-medium z-10 ${item.image ? 'text-white/90 drop-shadow-sm' : 'text-stone-500'}`}>{item.category}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+
+        const SavedItemCard = ({ item, recipes, onSelect }) => {
+          const food = recipes[item.foodId];
+          const variation = food?.variations.find(v => v.id === item.variationId);
+          if (!food || !variation) return null;
+
+          let subtitle = "Base recipe";
+          if (item.mode === 'specific') {
+              subtitle = `${item.targetYield} ${variation.yieldUnit}`;
+          } else if (item.mode === 'availability') {
+              const ing = variation.ingredients.find(i => i.id === item.selectedIngId);
+              if (ing) subtitle = `Using ${item.availableAmt}${ing.unit} of ${ing.name}`;
+          }
+
+          return (
+              <button onClick={() => onSelect(item)} className="bg-white border-2 border-stone-100 rounded-[1.25rem] p-5 text-left shadow-sm hover:border-amber-300 transition-colors flex items-center justify-between group active:scale-[0.98] w-full">
+                  <div>
+                      <h3 className="font-styrene text-lg font-bold text-stone-800">{food.name} <span className="text-sm font-tiempos font-normal text-stone-500">({variation.name})</span></h3>
+                      <p className="font-tiempos text-amber-600 font-medium text-sm mt-1">{subtitle}</p>
+                  </div>
+                  <i className="fa-solid fa-chevron-right text-stone-300 group-hover:text-amber-500"></i>
+              </button>
+          );
+        };
+
+        const FavouritesView = ({ favourites, recipes, onSelectSaved }) => (
+          <div className="h-full px-4 pb-4 overflow-y-auto bg-rose-50/30">
+            <h2 className="text-2xl font-styrene font-extrabold text-stone-800 tracking-tight mb-4 shrink-0 flex items-center gap-2">
+              <i className="fa-solid fa-heart text-rose-500"></i>
+              My Favourites
+            </h2>
+            {favourites.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-64 text-stone-400 font-tiempos text-center px-8">
+                <i className="fa-solid fa-heart text-5xl mb-4 text-stone-200"></i>
+                <p>No favourites yet. Bookmark specific recipes to access them quickly here.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3">
+                {favourites.map(fav => <SavedItemCard key={fav.id} item={fav} recipes={recipes} onSelect={onSelectSaved} />)}
+              </div>
+            )}
+          </div>
+        );
+
+        const UpNextView = ({ queue, recipes, onSelectSaved }) => (
+          <div className="h-full px-4 pb-4 overflow-y-auto bg-amber-50/30">
+            <h2 className="text-2xl font-styrene font-extrabold text-stone-800 tracking-tight mb-2 shrink-0 flex items-center gap-2">
+              <i className="fa-solid fa-list-check text-amber-500"></i>
+              Up Next
+            </h2>
+            <p className="font-tiempos text-stone-500 font-medium mb-4 text-sm">Your cooking queue (max 2 items).</p>
+            {queue.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-64 text-stone-400 font-tiempos text-center px-8">
+                <i className="fa-solid fa-list-check text-5xl mb-4 text-stone-200"></i>
+                <p>Nothing in your queue. Long-press a recipe or add it from the calculation page.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3">
+                {queue.map(qItem => <SavedItemCard key={qItem.id} item={qItem} recipes={recipes} onSelect={onSelectSaved} />)}
+              </div>
+            )}
+          </div>
+        );
+
+        const SettingsView = ({ appData, favourites, queue, onImport, setAlertMsg }) => {
+            const handleExport = () => {
+                const data = { appData, favourites, queue };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'food-maker-backup.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            };
+
+            const handleImport = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const imported = JSON.parse(event.target.result);
+                        if (imported.appData && imported.favourites && imported.queue) {
+                            onImport(imported);
+                            setAlertMsg("Data imported successfully!");
+                        } else {
+                            setAlertMsg("Invalid backup file.");
+                        }
+                    } catch (error) {
+                        setAlertMsg("Error reading file.");
+                    }
+                };
+                reader.readAsText(file);
+            };
+
+            return (
+                <div className="h-full px-4 pb-4 overflow-y-auto">
+                    <h2 className="text-2xl font-styrene font-extrabold text-stone-800 tracking-tight mb-4 mt-2 shrink-0 flex items-center gap-2">
+                      <i className="fa-solid fa-gear text-stone-500"></i> Settings & Data
+                    </h2>
+                    <div className="space-y-4 font-tiempos">
+                        <div className="bg-white p-5 rounded-[1.25rem] shadow-sm border border-stone-200">
+                            <h3 className="font-styrene font-bold text-lg mb-2">Backup Your Data</h3>
+                            <p className="text-stone-500 text-sm mb-4">Export your recipes, favourites, and queue to a file.</p>
+                            <button onClick={handleExport} className="w-full bg-amber-100 text-amber-800 font-styrene font-bold py-3 rounded-xl active:scale-95 transition-transform flex justify-center items-center gap-2">
+                                <i className="fa-solid fa-download"></i> Export Data
+                            </button>
+                        </div>
+                        <div className="bg-white p-5 rounded-[1.25rem] shadow-sm border border-stone-200">
+                            <h3 className="font-styrene font-bold text-lg mb-2">Restore Data</h3>
+                            <p className="text-stone-500 text-sm mb-4">Import a previously exported backup file.</p>
+                            <label className="w-full bg-stone-100 text-stone-700 font-styrene font-bold py-3 rounded-xl active:scale-95 transition-transform flex justify-center items-center gap-2 cursor-pointer">
+                                <i className="fa-solid fa-upload"></i> Import Data
+                                <input type="file" accept=".json" className="hidden" onChange={handleImport} />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const TrashView = ({ trash, onRestore, onDeletePerm }) => (
+            <div className="h-full px-4 pb-4 overflow-y-auto bg-stone-100/50">
+                <h2 className="text-2xl font-styrene font-extrabold text-stone-800 tracking-tight mb-4 mt-2 shrink-0 flex items-center gap-2">
+                    <i className="fa-solid fa-trash text-stone-500"></i> Trash
+                </h2>
+                {trash.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-64 text-stone-400 font-tiempos text-center px-8">
+                        <i className="fa-solid fa-trash text-5xl mb-4 text-stone-200"></i>
+                        <p>No deleted recipes.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 gap-3">
+                        {trash.map(recipe => (
+                            <div key={recipe.id} className="bg-white border-2 border-stone-100 rounded-[1.25rem] p-5 text-left shadow-sm flex flex-col gap-3">
+                                <div>
+                                    <h3 className="font-styrene text-lg font-bold text-stone-800">{recipe.name}</h3>
+                                    <p className="font-tiempos text-stone-500 text-sm mt-1">{recipe.variations.length} variations</p>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button onClick={() => onRestore(recipe)} className="flex-1 bg-amber-50 text-amber-700 font-styrene font-bold py-2 rounded-lg text-sm active:scale-95 transition-transform">Restore</button>
+                                    <button onClick={() => onDeletePerm(recipe.id)} className="flex-1 bg-rose-50 text-rose-700 font-styrene font-bold py-2 rounded-lg text-sm active:scale-95 transition-transform">Delete Forever</button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+
+        const CreateRecipeView = ({ onSave, categories, showAlert }) => {
+          const [categoryId, setCategoryId] = useState('');
+          const [foodName, setFoodName] = useState('');
+          const [varName, setVarName] = useState('');
+          const [baseYield, setBaseYield] = useState('');
+          const [yieldUnit, setYieldUnit] = useState('');
+          const [ingredients, setIngredients] = useState([{ name: '', baseAmount: '', unit: '' }]);
+          const [steps, setSteps] = useState(['']);
+
+          const addIngredient = () => setIngredients([...ingredients, { name: '', baseAmount: '', unit: '' }]);
+          const updateIngredient = (index, field, value) => {
+            const newIngs = [...ingredients];
+            newIngs[index][field] = value;
+            setIngredients(newIngs);
+          };
+          
+          const addStep = () => setSteps([...steps, '']);
+          const updateStep = (index, value) => {
+            const newSteps = [...steps];
+            newSteps[index] = value;
+            setSteps(newSteps);
+          };
+
+          const handleSave = () => {
+            if (!categoryId || !foodName || !varName || !baseYield) return showAlert("Please fill the basic details and select a category.");
+            
+            const newRecipe = {
+              id: foodName.toLowerCase().replace(/\s+/g, '-'),
+              name: foodName,
+              isCustom: true,
+              categoryId: categoryId,
+              variations: [{
+                id: varName.toLowerCase().replace(/\s+/g, '-'),
+                name: varName,
+                description: "Custom recipe created by you.",
+                baseYield: parseFloat(baseYield),
+                yieldUnit: yieldUnit || 'portions',
+                ingredients: ingredients.map((ing, i) => ({
+                  id: `ing-${i}`,
+                  name: ing.name,
+                  baseAmount: parseFloat(ing.baseAmount),
+                  unit: ing.unit
+                })).filter(ing => ing.name && !isNaN(ing.baseAmount)),
+                steps: steps.filter(s => s.trim() !== '')
+              }]
+            };
+            onSave({ newRecipe, categoryId });
+          };
+
+          return (
+            <div className="h-full p-4 overflow-y-auto pb-24 font-tiempos">
+              <h2 className="text-2xl font-styrene font-extrabold text-stone-800 tracking-tight mb-6">Create New Recipe</h2>
+              
+              <div className="space-y-6">
+                <div className="bg-white p-5 rounded-[1.25rem] shadow-sm border border-stone-200">
+                  <h3 className="font-styrene font-bold text-stone-800 mb-4">General Details</h3>
+                  <select className="w-full mb-3 p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none focus:border-amber-400 text-sm text-stone-700 cursor-pointer" value={categoryId} onChange={e => setCategoryId(e.target.value)}>
+                    <option value="" disabled>Select a Category...</option>
+                    {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+                  </select>
+                  <input className="w-full mb-3 p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none focus:border-amber-400 placeholder:text-xs text-sm text-stone-700" placeholder="Food Name" value={foodName} onChange={e => setFoodName(e.target.value)} />
+                  <input className="w-full mb-3 p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none focus:border-amber-400 placeholder:text-xs text-sm text-stone-700" placeholder="Variation Name" value={varName} onChange={e => setVarName(e.target.value)} />
+                  <div className="flex gap-3">
+                    <input type="number" className="min-w-0 flex-1 p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none focus:border-amber-400 placeholder:text-xs text-sm text-stone-700" placeholder="Base Yield" value={baseYield} onChange={e => setBaseYield(e.target.value)} />
+                    <input className="min-w-0 flex-1 p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none focus:border-amber-400 placeholder:text-xs text-sm text-stone-700" placeholder="Yield Unit" value={yieldUnit} onChange={e => setYieldUnit(e.target.value)} />
+                  </div>
+                </div>
+
+                <div className="bg-white p-5 rounded-[1.25rem] shadow-sm border border-stone-200">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-styrene font-bold text-stone-800">Ingredients</h3>
+                    <button onClick={addIngredient} className="text-amber-600 p-1 bg-amber-50 rounded-lg"><i className="fa-solid fa-plus"></i></button>
+                  </div>
+                  {ingredients.map((ing, i) => (
+                    <div key={i} className="flex gap-2 mb-3">
+                      <input className="min-w-0 flex-[2] p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none text-sm placeholder:text-xs text-stone-700" placeholder="Name" value={ing.name} onChange={e => updateIngredient(i, 'name', e.target.value)} />
+                      <input type="number" className="min-w-0 flex-[1] p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none text-sm placeholder:text-xs text-stone-700" placeholder="Amt" value={ing.baseAmount} onChange={e => updateIngredient(i, 'baseAmount', e.target.value)} />
+                      <select className="min-w-0 flex-[1.2] p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none text-sm text-stone-700 cursor-pointer" value={ing.unit} onChange={e => updateIngredient(i, 'unit', e.target.value)}>
+                        <option value="" disabled>Unit</option>
+                        <optgroup label="Metric">
+                          <option value="g">g</option>
+                          <option value="kg">kg</option>
+                          <option value="ml">ml</option>
+                          <option value="l">l</option>
+                        </optgroup>
+                        <optgroup label="Volume">
+                          <option value="tsp">tsp</option>
+                          <option value="tbsp">tbsp</option>
+                          <option value="cup">cup</option>
+                          <option value="cups">cups</option>
+                        </optgroup>
+                        <optgroup label="Other">
+                          <option value="units">units</option>
+                          <option value="pieces">pieces</option>
+                          <option value="slices">slices</option>
+                          <option value="portions">portions</option>
+                        </optgroup>
+                      </select>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="bg-white p-5 rounded-[1.25rem] shadow-sm border border-stone-200">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-styrene font-bold text-stone-800">Steps</h3>
+                    <button onClick={addStep} className="text-amber-600 p-1 bg-amber-50 rounded-lg"><i className="fa-solid fa-plus"></i></button>
+                  </div>
+                  {steps.map((step, i) => (
+                    <div key={i} className="flex gap-2 mb-3 items-start">
+                      <span className="mt-3 font-styrene text-stone-400 font-bold">{i+1}.</span>
+                      <textarea className="min-w-0 flex-1 p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none text-sm placeholder:text-xs text-stone-700 min-h-[60px]" placeholder={`Step ${i+1}`} value={step} onChange={e => updateStep(i, e.target.value)} />
+                    </div>
+                  ))}
+                </div>
+
+                <button onClick={handleSave} className="w-full bg-stone-900 text-white font-styrene font-bold text-lg p-4 rounded-xl flex items-center justify-center gap-2 hover:bg-stone-800 transition-colors">
+                  <i className="fa-solid fa-floppy-disk"></i> Save Recipe
+                </button>
+              </div>
+            </div>
+          );
+        };
+
+        const VariationsView = ({ food, onSelectVariation, onLongPress, onDeleteRecipe }) => {
+          const timerRef = useRef(null);
+
+          const handlePointerDown = (variationId) => {
+            timerRef.current = setTimeout(() => {
+              onLongPress(food.id, variationId);
+            }, 600);
+          };
+
+          const handlePointerUp = () => {
+            if (timerRef.current) clearTimeout(timerRef.current);
+          };
+
+          return (
+            <div className="h-full p-4 overflow-y-auto pb-20">
+              <div className="flex justify-between items-start mb-2">
+                <h2 className="text-[1.7rem] font-styrene font-extrabold text-stone-800 tracking-tight">Choose a variation</h2>
+                {food.isCustom && (
+                  <button onClick={() => onDeleteRecipe(food)} className="p-3 -mr-2 -mt-2 text-rose-400 hover:text-rose-600 active:scale-95 transition-all">
+                    <i className="fa-solid fa-trash text-xl"></i>
+                  </button>
+                )}
+              </div>
+              <p className="font-tiempos text-stone-500 font-medium mb-6">Which {food.name} recipe do you want to make today? <br/><span className="text-xs text-stone-400">(Tip: Hold down a card to quickly save it)</span></p>
+              
+              <div className="space-y-4">
+                {food.variations.map(variation => (
+                  <button
+                    key={variation.id}
+                    onPointerDown={() => handlePointerDown(variation.id)}
+                    onPointerUp={handlePointerUp}
+                    onPointerLeave={handlePointerUp}
+                    onClick={() => onSelectVariation(variation.id)}
+                    className="w-full text-left bg-white rounded-[1.25rem] shadow-sm border border-stone-200 hover:border-amber-400 hover:shadow-md transition-all active:scale-[0.98] flex flex-col relative overflow-hidden group touch-action-manipulation select-none"
+                  >
+                    {variation.image ? (
+                        <div className="w-full h-40 bg-cover bg-center border-b border-stone-100" style={{ backgroundImage: `url('${variation.image}')` }} />
+                    ) : (
+                        <div className={`w-full h-28 bg-gradient-to-br ${variation.bg || 'from-stone-50 to-stone-100'} border-b border-stone-100/50 flex items-center justify-center`}>
+                            <div className="w-12 h-12 rounded-full bg-white/50 backdrop-blur-sm shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center justify-center border border-white/60">
+                                 <i className="fa-solid fa-utensils text-lg text-stone-500/50"></i>
+                            </div>
+                        </div>
+                    )}
+                    <div className="p-5 flex flex-col gap-2 relative z-10 bg-white">
+                        <div className="flex justify-between items-center w-full">
+                          <h3 className="text-xl font-styrene font-extrabold text-stone-800 group-hover:text-amber-600 transition-colors">{variation.name}</h3>
+                          <i className="fa-solid fa-chevron-right text-stone-300 group-hover:text-amber-400 transition-colors"></i>
+                        </div>
+                        <p className="font-tiempos text-stone-500 text-sm leading-relaxed">{variation.description}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        };
+
+        const CalcModeView = ({ onSelectMode }) => (
+          <div className="h-full p-4 overflow-y-auto pb-20">
+            <h2 className="text-[1.7rem] font-styrene font-extrabold text-stone-800 tracking-tight mb-2">How to calculate?</h2>
+            <p className="font-tiempos text-stone-500 font-medium mb-6">Choose how you want to measure your ingredients.</p>
+            <div className="space-y-4">
+              <button
+                onClick={() => onSelectMode('specific')}
+                className="w-full text-left bg-white p-6 rounded-[1.25rem] shadow-sm border border-stone-200 hover:border-amber-400 transition-all active:scale-[0.98] group flex flex-col gap-4"
+              >
+                <div className="bg-[#F8F2EA] w-12 h-12 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <i className="fa-solid fa-calculator text-2xl text-[#9A623A]"></i>
+                </div>
+                <div>
+                  <h3 className="text-xl font-styrene font-extrabold text-[#332211] mb-1">Specific amount</h3>
+                  <p className="font-tiempos text-stone-500 text-sm leading-relaxed">Tell us how many portions you want to make and we'll calculate the whole recipe.</p>
+                </div>
+              </button>
+
+              <button
+                onClick={() => onSelectMode('availability')}
+                className="w-full text-left bg-gradient-to-br from-[#FDE397] to-[#E5AC44] p-6 rounded-[1.25rem] shadow-sm border border-amber-200 hover:shadow-md transition-all active:scale-[0.98] group flex flex-col gap-4"
+              >
+                <div className="bg-[#FEF1CD] w-12 h-12 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+                  <i className="fa-solid fa-leaf text-2xl text-[#824E26]"></i>
+                </div>
+                <div>
+                  <h3 className="text-xl font-styrene font-extrabold text-[#412510] mb-1">Use what I have</h3>
+                  <p className="font-tiempos text-[#6C441D] text-sm leading-relaxed font-medium">Enter available ingredients and find out how many portions it yields.</p>
+                </div>
+              </button>
+            </div>
+          </div>
+        );
+
+        const RecipeView = ({ variation, mode, calcParams, setCalcParams }) => {
+          useEffect(() => {
+            if (mode === 'specific' && calcParams.targetYield === null) {
+              setCalcParams(prev => ({ ...prev, targetYield: variation.baseYield }));
+            } else if (mode === 'availability' && calcParams.selectedIngId === null) {
+              setCalcParams(prev => ({ ...prev, selectedIngId: variation.ingredients[0].id, availableAmt: variation.ingredients[0].baseAmount }));
+            }
+          }, [mode, variation, calcParams.targetYield, calcParams.selectedIngId, setCalcParams]);
+
+          const displayTargetYield = calcParams.targetYield !== null ? calcParams.targetYield : variation.baseYield;
+          const displaySelectedIngId = calcParams.selectedIngId !== null ? calcParams.selectedIngId : variation.ingredients[0].id;
+          const displayAvailableAmt = calcParams.availableAmt !== null ? calcParams.availableAmt : variation.ingredients[0].baseAmount;
+
+          let multiplier = 1;
+          let estimatedYield = variation.baseYield;
+
+          if (mode === 'specific') {
+            const parsedYield = parseFloat(displayTargetYield) || 0;
+            multiplier = parsedYield / variation.baseYield;
+            estimatedYield = parsedYield;
+          } else {
+            const baseIng = variation.ingredients.find(i => i.id === displaySelectedIngId);
+            const parsedAmt = parseFloat(displayAvailableAmt) || 0;
+            if(baseIng) multiplier = parsedAmt / baseIng.baseAmount;
+            estimatedYield = variation.baseYield * multiplier;
+          }
+
+          const formatAmount = (ing) => {
+            const calcMetric = ing.baseAmount * multiplier;
+            const calcVol = ing.volAmount ? ing.volAmount * multiplier : null;
+
+            let metricStr = isNaN(calcMetric) || calcMetric === 0 ? "0" : 
+                (ing.unit === 'units' ? calcMetric.toFixed(1).replace('.0', '') : Math.round(calcMetric).toString());
+            
+            let volStr = null;
+            if (calcVol) {
+               volStr = parseFloat(calcVol.toFixed(2)).toString(); 
+            }
+
+            return {
+              metricVal: metricStr,
+              metricUnit: ing.unit,
+              volVal: volStr,
+              volUnit: ing.volUnit
+            };
+          };
+
+          return (
+            <div className="h-full p-4 overflow-y-auto pb-24 scroll-smooth font-tiempos">
+              {mode === 'specific' ? (
+                <div className="bg-white p-6 rounded-[1.25rem] shadow-sm border border-stone-200 mb-8 pl-10">
+                  <label className="block text-[0.7rem] font-styrene font-bold text-stone-500 mb-2 uppercase tracking-wide">
+                    How many {variation.yieldUnit} do you want?
+                  </label>
+                  <div className="flex items-end gap-3 pl-4">
+                    <input 
+                      type="number" 
+                      min="0"
+                      value={displayTargetYield} 
+                      onChange={e => setCalcParams(prev => ({ ...prev, targetYield: e.target.value }))} 
+                      className="w-full text-4xl font-styrene font-extrabold text-stone-800 bg-transparent border-b-2 border-stone-200 focus:border-amber-500 outline-none pb-2 transition-colors pl-2" 
+                    />
+                    <span className="text-base font-styrene font-bold text-stone-400 pb-2">{variation.yieldUnit}</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-white p-6 rounded-[1.25rem] shadow-sm border border-stone-200 mb-8 flex flex-col gap-6 relative overflow-hidden pl-10">
+                  <div className="absolute top-0 left-0 w-1.5 h-full bg-amber-400"></div>
+                  <div>
+                    <label className="block text-[0.7rem] font-styrene font-bold text-stone-500 mb-2 uppercase tracking-wide">Base ingredient</label>
+                    <div className="pl-4">
+                        <select 
+                          value={displaySelectedIngId} 
+                          onChange={e => {
+                            const newBaseIng = variation.ingredients.find(i => i.id === e.target.value);
+                            setCalcParams(prev => ({ ...prev, selectedIngId: e.target.value, availableAmt: newBaseIng.baseAmount }));
+                          }} 
+                          className="w-full text-base font-styrene font-bold text-stone-800 bg-transparent border-b-2 border-stone-200 focus:border-amber-500 outline-none pb-2 cursor-pointer pl-1"
+                        >
+                          {variation.ingredients.map(ing => <option key={ing.id} value={ing.id}>{ing.name}</option>)}
+                        </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[0.7rem] font-styrene font-bold text-stone-500 mb-2 uppercase tracking-wide">Available amount</label>
+                    <div className="flex items-end gap-3 pl-4">
+                      <input 
+                        type="number" 
+                        min="0"
+                        value={displayAvailableAmt} 
+                        onChange={e => setCalcParams(prev => ({ ...prev, availableAmt: e.target.value }))} 
+                        className="w-full text-4xl font-styrene font-extrabold text-stone-800 bg-transparent border-b-2 border-stone-200 focus:border-amber-500 outline-none pb-2 transition-colors pl-2" 
+                      />
+                      <span className="text-base font-styrene font-bold text-stone-400 pb-2">
+                        {variation.ingredients.find(i => i.id === displaySelectedIngId)?.unit || ''}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="bg-amber-50 border border-amber-100 text-[#824E26] p-4 rounded-xl flex items-center justify-between mt-2 shadow-sm ml-[-0.5rem]">
+                    <span className="font-semibold text-sm">Estimated yield:</span>
+                    <span className="font-styrene font-extrabold text-lg">{Math.round(estimatedYield || 0)} {variation.yieldUnit}</span>
+                  </div>
+                </div>
+              )}
+              
+              <h3 className="text-xl font-styrene font-extrabold text-stone-800 tracking-tight mb-4">Ingredients</h3>
+              <div className="bg-white rounded-[1.25rem] shadow-sm border border-stone-200 overflow-hidden mb-8">
+                <ul className="divide-y divide-stone-100">
+                  {variation.ingredients.map(ing => {
+                    const formatted = formatAmount(ing);
+                    return (
+                      <li key={ing.id} className="p-4 flex items-center justify-between hover:bg-stone-50 transition-colors">
+                        <span className="font-styrene font-bold text-stone-700 text-[0.90rem]">{ing.name}</span>
+                        <div className="text-right shrink-0 ml-4">
+                          {formatted.volVal && (
+                            <div className="font-tiempos text-stone-800 font-medium text-sm">
+                              {formatted.volVal} {formatted.volUnit}
+                            </div>
+                          )}
+                          <div className={`font-tiempos text-xs ${formatted.volVal ? 'text-stone-400' : 'text-stone-800 font-medium text-sm'}`}>
+                            {formatted.metricVal} {formatted.metricUnit}
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+
+              <h3 className="text-xl font-styrene font-extrabold text-stone-800 tracking-tight mb-5">Instructions</h3>
+              <div className="space-y-5">
+                {variation.steps.map((step, index) => (
+                  <div key={index} className="flex gap-3 items-start">
+                    <div className="w-7 h-7 rounded-full bg-[#C66D29] text-white flex items-center justify-center font-styrene font-bold shrink-0 mt-0.5 shadow-sm text-sm">
+                      {index + 1}
+                    </div>
+                    <p className="text-stone-700 font-medium leading-relaxed pt-0.5 text-[0.95rem]">{step}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        };
+
+        const App = () => {
+          // Initialize state from Local Storage
+          const [appData, setAppData] = useState(() => {
+            const saved = localStorage.getItem('foodMakerAppData');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                
+                // Migration: Remove deprecated AI images and apply elegant gradient backgrounds
+                if (parsed.latestUpdates && parsed.latestUpdates[0]?.image?.includes('pollinations')) {
+                     parsed.latestUpdates[0] = { ...parsed.latestUpdates[0], image: null, bg: 'from-amber-100 to-orange-100' };
+                }
+                if (parsed.recipes && parsed.recipes["pao-de-queijo"]) {
+                     parsed.recipes["pao-de-queijo"].variations.forEach(v => {
+                         if (v.image?.includes('pollinations')) delete v.image;
+                         if (v.id === 'tradicional') v.bg = 'from-amber-100 to-orange-50';
+                         if (v.id === 'crio') v.bg = 'from-stone-100 to-stone-200';
+                     });
+                }
+
+                if (!parsed.trash) parsed.trash = []; // Migration for older saves
+                return parsed;
+            }
+            return initialAppData;
+          });
+          const [favourites, setFavourites] = useState(() => JSON.parse(localStorage.getItem('foodMakerFavs')) || []); 
+          const [queue, setQueue] = useState(() => JSON.parse(localStorage.getItem('foodMakerQueue')) || []); 
+
+          // Sync state to Local Storage
+          useEffect(() => localStorage.setItem('foodMakerAppData', JSON.stringify(appData)), [appData]);
+          useEffect(() => localStorage.setItem('foodMakerFavs', JSON.stringify(favourites)), [favourites]);
+          useEffect(() => localStorage.setItem('foodMakerQueue', JSON.stringify(queue)), [queue]);
+
+          const [view, setView] = useState('home'); 
+          const [foodId, setFoodId] = useState(null);
+          const [variationId, setVariationId] = useState(null);
+          const [calcMode, setCalcMode] = useState(null);
+          const [isMenuOpen, setIsMenuOpen] = useState(false);
+          const [alertMsg, setAlertMsg] = useState(null);
+          const [calcParams, setCalcParams] = useState({ targetYield: null, selectedIngId: null, availableAmt: null });
+          const [longPressModal, setLongPressModal] = useState(null);
+
+          const handleSelectFood = (id) => {
+            setFoodId(id);
+            setView('variations');
+          };
+
+          const handleSelectVariation = (id) => {
+            setVariationId(id);
+            setCalcParams({ targetYield: null, selectedIngId: null, availableAmt: null });
+            setView('calcMode');
+          };
+
+          const handleSelectMode = (mode) => {
+            setCalcMode(mode);
+            setView('recipe');
+          };
+
+          const handleSelectSaved = (savedItem) => {
+            setFoodId(savedItem.foodId);
+            setVariationId(savedItem.variationId);
+            if (savedItem.mode) {
+                setCalcMode(savedItem.mode);
+                setCalcParams({
+                    targetYield: savedItem.targetYield,
+                    selectedIngId: savedItem.selectedIngId,
+                    availableAmt: savedItem.availableAmt
+                });
+                setView('recipe');
+            } else {
+                setCalcParams({ targetYield: null, selectedIngId: null, availableAmt: null });
+                setView('calcMode');
+            }
+          };
+
+          const goBack = () => {
+            if (view === 'recipe') setView('calcMode');
+            else if (view === 'calcMode') setView('variations');
+            else if (view === 'variations') {
+              setView('home');
+              setFoodId(null);
+            }
+            else if (['favourites', 'queue', 'create', 'settings', 'trash'].includes(view)) setView('home');
+          };
+
+          const isCurrentSaved = (list) => list.some(item =>
+               item.foodId === foodId &&
+               item.variationId === variationId &&
+               item.mode === calcMode &&
+               String(item.targetYield) === String(calcParams.targetYield) &&
+               String(item.selectedIngId) === String(calcParams.selectedIngId) &&
+               String(item.availableAmt) === String(calcParams.availableAmt)
+          );
+
+          const toggleFavourite = () => {
+            if (!foodId || !variationId || view !== 'recipe') return;
+            if (isCurrentSaved(favourites)) {
+                setFavourites(prev => prev.filter(item => !(item.foodId === foodId && item.variationId === variationId && item.mode === calcMode && String(item.targetYield) === String(calcParams.targetYield) && String(item.selectedIngId) === String(calcParams.selectedIngId) && String(item.availableAmt) === String(calcParams.availableAmt))));
+            } else {
+                setFavourites(prev => [...prev, { id: Date.now().toString(), foodId, variationId, mode: calcMode, ...calcParams }]);
+            }
+          };
+
+          const toggleQueue = () => {
+            if (!foodId || !variationId || view !== 'recipe') return;
+            if (isCurrentSaved(queue)) {
+                setQueue(prev => prev.filter(item => !(item.foodId === foodId && item.variationId === variationId && item.mode === calcMode && String(item.targetYield) === String(calcParams.targetYield) && String(item.selectedIngId) === String(calcParams.selectedIngId) && String(item.availableAmt) === String(calcParams.availableAmt))));
+            } else {
+                setQueue(prev => [...prev, { id: Date.now().toString(), foodId, variationId, mode: calcMode, ...calcParams }].slice(-2));
+            }
+          };
+
+          const handleLongPress = (fId, vId) => {
+            setLongPressModal({ foodId: fId, variationId: vId });
+          };
+
+          const addToGenericSaved = (listType) => {
+            if (!longPressModal) return;
+            const newItem = { id: Date.now().toString(), foodId: longPressModal.foodId, variationId: longPressModal.variationId, mode: null, targetYield: null, selectedIngId: null, availableAmt: null };
+            if (listType === 'fav') {
+                setFavourites(prev => [...prev, newItem]);
+            } else {
+                setQueue(prev => [...prev, newItem].slice(-2));
+            }
+            setLongPressModal(null);
+            setAlertMsg("Saved successfully!");
+          };
+
+          const handleShare = () => {
+             const food = appData.recipes[foodId];
+             const variation = food.variations.find(v => v.id === variationId);
+             const title = `${food.name} ${variation.name}`;
+             if(navigator.share) {
+                 navigator.share({
+                     title: title,
+                     text: `Check out this recipe for ${title} on Food Maker!`
+                 }).catch(err => console.log('Error sharing', err));
+             }
+          };
+
+          const handleCreateRecipe = ({ newRecipe, categoryId }) => {
+            setAppData(prev => {
+              const updatedMenu = prev.menu.map(cat => {
+                if (cat.id === categoryId) {
+                  let myRecipesSub = cat.subcategories.find(s => s.id === 'my-recipes');
+                  if (!myRecipesSub) {
+                    myRecipesSub = { id: 'my-recipes', name: 'My Recipes', foods: [] };
+                    return { ...cat, subcategories: [...cat.subcategories, myRecipesSub] };
+                  }
+                }
+                return cat;
+              });
+
+              const finalMenu = updatedMenu.map(cat => {
+                 if (cat.id === categoryId) {
+                    return {
+                        ...cat,
+                        subcategories: cat.subcategories.map(sub => {
+                            if (sub.id === 'my-recipes') {
+                                return { ...sub, foods: [...sub.foods, { id: newRecipe.id, name: newRecipe.name }] };
+                            }
+                            return sub;
+                        })
+                    }
+                 }
+                 return cat;
+              });
+
+              return {
+                ...prev,
+                menu: finalMenu,
+                recipes: { ...prev.recipes, [newRecipe.id]: newRecipe },
+                latestUpdates: [
+                  { id: `new-${Date.now()}`, type: 'food', foodId: newRecipe.id, title: newRecipe.name, category: 'My Recipes', bg: 'from-green-400 to-emerald-500' },
+                  ...prev.latestUpdates.slice(0, 7)
+                ]
+              };
+            });
+            setFoodId(newRecipe.id);
+            setView('variations');
+          };
+
+          const handleDeleteRecipe = (recipe) => {
+            setAppData(prev => {
+                const newRecipes = { ...prev.recipes };
+                delete newRecipes[recipe.id];
+
+                const newMenu = prev.menu.map(cat => ({
+                    ...cat,
+                    subcategories: cat.subcategories.map(sub => ({
+                        ...sub,
+                        foods: sub.foods.filter(f => f.id !== recipe.id)
+                    }))
+                }));
+
+                return { ...prev, menu: newMenu, recipes: newRecipes, trash: [...(prev.trash || []), recipe] };
+            });
+            setView('home');
+            setAlertMsg(`${recipe.name} moved to trash.`);
+          };
+
+          const handleRestoreRecipe = (recipe) => {
+            setAppData(prev => {
+                const catId = recipe.categoryId || 'snacks';
+                const newMenu = prev.menu.map(cat => {
+                    if (cat.id === catId) {
+                        let myRecipesSub = cat.subcategories.find(s => s.id === 'my-recipes');
+                        if (!myRecipesSub) return { ...cat, subcategories: [...cat.subcategories, { id: 'my-recipes', name: 'My Recipes', foods: [] }] };
+                    }
+                    return cat;
+                }).map(cat => {
+                    if (cat.id === catId) {
+                        return { ...cat, subcategories: cat.subcategories.map(sub => sub.id === 'my-recipes' ? { ...sub, foods: [...sub.foods, { id: recipe.id, name: recipe.name }] } : sub) };
+                    }
+                    return cat;
+                });
+
+                return {
+                    ...prev,
+                    menu: newMenu,
+                    recipes: { ...prev.recipes, [recipe.id]: recipe },
+                    trash: prev.trash.filter(r => r.id !== recipe.id)
+                };
+            });
+            setAlertMsg(`${recipe.name} restored.`);
+          };
+
+          const handleDeletePerm = (id) => {
+            setAppData(prev => ({ ...prev, trash: prev.trash.filter(r => r.id !== id) }));
+            setAlertMsg(`Recipe permanently deleted.`);
+          };
+
+          const handleImportData = (importedData) => {
+            setAppData(importedData.appData);
+            setFavourites(importedData.favourites);
+            setQueue(importedData.queue);
+            setView('home');
+          };
+
+          let headerTitle = "Food Maker";
+          if (view === 'variations' && foodId) headerTitle = appData.recipes[foodId]?.name;
+          if (view === 'calcMode') headerTitle = "Calculation";
+          if (view === 'recipe' && foodId && variationId) {
+            const food = appData.recipes[foodId];
+            const variation = food?.variations.find(v => v.id === variationId);
+            headerTitle = `${food?.name} ${variation?.name}`;
+          }
+          if (view === 'favourites') headerTitle = "My Favourites";
+          if (view === 'queue') headerTitle = "Up Next";
+          if (view === 'create') headerTitle = "Create Recipe";
+          if (view === 'settings') headerTitle = "Settings & Data";
+          if (view === 'trash') headerTitle = "Trash";
+
+          return (
+            <div className="h-full w-full flex flex-col overflow-hidden selection:bg-amber-200 relative">
+              <CustomAlert message={alertMsg} onClose={() => setAlertMsg(null)} />
+              
+              <Header 
+                onMenuClick={() => setIsMenuOpen(true)} 
+                onBack={goBack} 
+                view={view} 
+                title={headerTitle} 
+                isFavourite={isCurrentSaved(favourites)}
+                toggleFavourite={toggleFavourite}
+                isQueued={isCurrentSaved(queue)}
+                toggleQueue={toggleQueue}
+                onShare={handleShare}
+              />
+              
+              <SideMenu 
+                isOpen={isMenuOpen} 
+                onClose={() => setIsMenuOpen(false)} 
+                onSelectFood={handleSelectFood}
+                onOpenFavourites={() => setView('favourites')}
+                onOpenQueue={() => setView('queue')}
+                onOpenCreate={() => setView('create')}
+                onOpenTrash={() => setView('trash')}
+                onOpenSettings={() => setView('settings')}
+                menuData={appData.menu}
+              />
+
+              <main className="flex-1 overflow-hidden relative">
+                {view === 'home' && <HomeView onSelectFood={handleSelectFood} latestUpdates={appData.latestUpdates} />}
+                {view === 'favourites' && <FavouritesView favourites={favourites} recipes={appData.recipes} onSelectSaved={handleSelectSaved} />}
+                {view === 'queue' && <UpNextView queue={queue} recipes={appData.recipes} onSelectSaved={handleSelectSaved} />}
+                {view === 'create' && <CreateRecipeView onSave={handleCreateRecipe} categories={appData.menu} showAlert={setAlertMsg} />}
+                {view === 'settings' && <SettingsView appData={appData} favourites={favourites} queue={queue} onImport={handleImportData} setAlertMsg={setAlertMsg} />}
+                {view === 'trash' && <TrashView trash={appData.trash} onRestore={handleRestoreRecipe} onDeletePerm={handleDeletePerm} />}
+                {view === 'variations' && <VariationsView food={appData.recipes[foodId]} onSelectVariation={handleSelectVariation} onLongPress={handleLongPress} onDeleteRecipe={handleDeleteRecipe} />}
+                {view === 'calcMode' && <CalcModeView onSelectMode={handleSelectMode} />}
+                {view === 'recipe' && (
+                  <RecipeView 
+                    variation={appData.recipes[foodId].variations.find(v => v.id === variationId)} 
+                    mode={calcMode}
+                    calcParams={calcParams}
+                    setCalcParams={setCalcParams}
+                  />
+                )}
+              </main>
+
+              {longPressModal && (
+                <div className="fixed inset-0 bg-stone-900/60 z-[60] flex items-end justify-center sm:items-center p-4 animate-in fade-in" onClick={() => setLongPressModal(null)}>
+                   <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl transform transition-transform animate-in slide-in-from-bottom-4" onClick={e => e.stopPropagation()}>
+                      <h3 className="font-styrene font-bold text-xl text-stone-800 mb-4">Quick Save</h3>
+                      <div className="space-y-3">
+                         <button onClick={() => addToGenericSaved('fav')} className="w-full bg-rose-50 text-rose-600 font-styrene font-bold p-4 rounded-2xl flex items-center gap-3 active:scale-95 transition-transform">
+                            <i className="fa-solid fa-heart text-2xl"></i> My Favourites
+                         </button>
+                         <button onClick={() => addToGenericSaved('queue')} className="w-full bg-amber-50 text-amber-600 font-styrene font-bold p-4 rounded-2xl flex items-center gap-3 active:scale-95 transition-transform">
+                            <i className="fa-solid fa-list-check text-2xl"></i> Up Next
+                         </button>
+                      </div>
+                   </div>
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
