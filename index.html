@@ -49,7 +49,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.6/babel.min.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap');
         
         :root {
           --font-display: "Fraunces", ui-serif, Georgia, serif;
@@ -158,15 +158,31 @@
               ] 
             },
             { 
-              id: "seafood", name: "Seafood", icon: <i className="fa-solid fa-fish w-5 h-5 flex items-center justify-center text-lg"></i>, subcategories: [] },
+              id: "drinks", name: "Drinks", icon: <i className="fa-solid fa-glass-water w-5 h-5 flex items-center justify-center text-lg"></i>, 
+              subcategories: [
+                 {
+                   id: "cocktails", name: "Cocktails",
+                   foods: [
+                       { id: "canchanchara", name: "Canchanchara" },
+                       { id: "mojito-cubano", name: "Mojito Cubano" },
+                       { id: "pina-colada", name: "Piña Colada" },
+                       { id: "caipirinha-plus", name: "Caipirinha+" },
+                       { id: "espresso-banana", name: "Espresso Banana" },
+                       { id: "brazilian-moscow-mule", name: "Brazilian Moscow Mule" },
+                       { id: "brazilian-mojito", name: "Brazilian Mojito" }
+                   ]
+                 }
+              ] 
+            },
+            { id: "seafood", name: "Seafood", icon: <i className="fa-solid fa-fish w-5 h-5 flex items-center justify-center text-lg"></i>, subcategories: [] },
           ],
           latestUpdates: [
             { id: '1', type: 'food', foodId: 'espresso-banana', title: 'Espresso Banana', category: 'Drinks', bg: 'from-sky-100 to-blue-200', textLight: false, icon: 'fa-glass-water' },
             { id: '2', type: 'food', foodId: 'brownies', title: 'Brownies da Lê', category: 'Desserts', bg: 'from-rose-100 to-pink-200', textLight: false, icon: 'fa-cake-candles' },
-            { id: '3', type: 'food', foodId: 'pao-de-queijo', title: 'Pão de Queijo', category: 'Brazilian Snacks', bg: 'from-amber-100 to-orange-100', textLight: false, icon: 'fa-cookie-bite' },
+            { id: '3', type: 'food', foodId: 'pao-de-queijo', title: 'Pão de Queijo', category: 'Snacks', bg: 'from-amber-100 to-orange-100', textLight: false, icon: 'fa-cookie-bite' },
             { id: '4', type: 'food', foodId: 'caipirinha-plus', title: 'Caipirinha+', category: 'Drinks', bg: 'from-sky-100 to-blue-200', textLight: false, icon: 'fa-glass-water' },
-            { id: '5', type: 'food', foodId: 'pasta-al-limone', title: 'Pasta al Limone', category: 'Italian Pasta', bg: 'from-yellow-100 to-lime-100', textLight: false, icon: 'fa-bowl-food' },
-            { id: '6', type: 'food', foodId: 'cinnamon-apple-cake', title: 'Cinnamon Apple Cake', category: 'Cakes', bg: 'from-rose-100 to-pink-200', textLight: false, icon: 'fa-cake-candles' },
+            { id: '5', type: 'food', foodId: 'pasta-al-limone', title: 'Pasta al Limone', category: 'Pasta', bg: 'from-yellow-100 to-lime-100', textLight: false, icon: 'fa-bowl-food' },
+            { id: '6', type: 'food', foodId: 'cinnamon-apple-cake', title: 'Cinnamon Apple Cake', category: 'Desserts', bg: 'from-rose-100 to-pink-200', textLight: false, icon: 'fa-cake-candles' },
             { id: '7', type: 'food', foodId: 'burger-patty', title: 'Umami Burger', category: 'BBQ', bg: 'from-red-100 to-rose-200', textLight: false, icon: 'fa-fire-burner' },
             { id: '8', type: 'food', foodId: 'canchanchara', title: 'Canchanchara', category: 'Drinks', bg: 'from-sky-100 to-blue-200', textLight: false, icon: 'fa-glass-water' },
           ],
@@ -181,7 +197,7 @@
                   id: "classic",
                   name: "Classic Canchanchara",
                   description: "A bright, honey-sweetened rum classic.",
-                  bg: 'from-amber-100 to-orange-100',
+                  bg: 'from-sky-100 to-blue-200',
                   textLight: false,
                   baseYield: 1,
                   yieldUnit: "drink",
@@ -206,7 +222,7 @@
                   id: "classic",
                   name: "Classic Mojito Cubano",
                   description: "The traditional refreshing mint and rum cocktail.",
-                  bg: 'from-emerald-100 to-teal-100',
+                  bg: 'from-sky-100 to-blue-200',
                   textLight: false,
                   baseYield: 1,
                   yieldUnit: "drink",
@@ -238,7 +254,7 @@
                   id: "blended",
                   name: "Blended Piña Colada",
                   description: "A frosty, tropical coconut and pineapple blend.",
-                  bg: 'from-yellow-100 to-amber-100',
+                  bg: 'from-sky-100 to-blue-200',
                   textLight: false,
                   baseYield: 1,
                   yieldUnit: "drink",
@@ -266,7 +282,7 @@
                   id: "tangerine-ginger",
                   name: "Tangerine & Ginger",
                   description: "A complex, zesty upgrade to the classic Caipirinha.",
-                  bg: 'from-orange-100 to-amber-200',
+                  bg: 'from-sky-100 to-blue-200',
                   textLight: false,
                   baseYield: 1,
                   yieldUnit: "drink",
@@ -297,8 +313,8 @@
                   id: "creamy",
                   name: "Creamy Espresso Banana",
                   description: "A rich, caffeinated, and fruity cocktail.",
-                  bg: 'from-[#C3A995] to-[#A8876F]',
-                  textLight: true,
+                  bg: 'from-sky-100 to-blue-200',
+                  textLight: false,
                   baseYield: 1,
                   yieldUnit: "drink",
                   ingredients: [
@@ -327,7 +343,7 @@
                   id: "ginger-foam",
                   name: "With Ginger Foam",
                   description: "A zesty vodka classic topped with an airy ginger foam. See notes for the syrup and foam recipes.",
-                  bg: 'from-emerald-50 to-lime-100',
+                  bg: 'from-sky-100 to-blue-200',
                   textLight: false,
                   baseYield: 1,
                   yieldUnit: "drink",
@@ -360,7 +376,7 @@
                   id: "strawberry",
                   name: "Strawberry Mojito",
                   description: "A fruity twist on the mojito using cachaça and fresh strawberries.",
-                  bg: 'from-rose-100 to-pink-200',
+                  bg: 'from-sky-100 to-blue-200',
                   textLight: false,
                   baseYield: 1,
                   yieldUnit: "drink",
@@ -563,7 +579,7 @@
                   id: "fitwaffle-kitchen",
                   name: "Fitwaffle Kitchen",
                   description: "A warm, gooey apple cake with a cinnamon swirl and sweet glaze.",
-                  bg: 'from-rose-100 to-red-200',
+                  bg: 'from-rose-100 to-pink-200',
                   baseYield: 16,
                   yieldUnit: "pieces",
                   source: "https://fitwafflekitchen.com/cinnamon-apple-cake/",
@@ -978,7 +994,7 @@
              const food = recipes[fId];
              const variation = food.variations.find(v => v.id === vId);
 
-             setCategoryId(food.categoryId || 'snacks');
+             setCategoryId(food.categoryId || categoryId || 'snacks');
              setFoodName(food.name + ' (Copy)');
              setVarName(variation.name);
              setBaseYield(variation.baseYield);
@@ -1165,11 +1181,11 @@
                     onPointerUp={handlePointerUp}
                     onPointerLeave={handlePointerUp}
                     onClick={() => onSelectVariation(variation.id)}
-                    className="w-full text-left bg-white rounded-[1.25rem] shadow-sm border border-stone-200 hover:border-amber-400 hover:shadow-md transition-all active:scale-[0.98] flex flex-col relative overflow-hidden group touch-action-manipulation select-none p-5"
+                    className="w-full text-left bg-white rounded-[1.25rem] shadow-sm border border-stone-200 hover:border-amber-400 hover:shadow-md transition-all active:scale-[0.98] flex flex-col p-5 touch-action-manipulation select-none"
                   >
                     <div className="flex justify-between items-center w-full mb-2">
-                      <h3 className="text-xl font-display font-extrabold text-stone-800 group-hover:text-amber-600 transition-colors">{variation.name}</h3>
-                      <i className="fa-solid fa-chevron-right text-stone-300 group-hover:text-amber-400 transition-colors"></i>
+                      <h3 className="text-xl font-display font-extrabold text-stone-800 transition-colors">{variation.name}</h3>
+                      <i className="fa-solid fa-chevron-right text-stone-300 transition-colors"></i>
                     </div>
                     {variation.description && <p className="font-sans text-stone-500 text-sm leading-relaxed">{variation.description}</p>}
                   </button>
@@ -1452,11 +1468,11 @@
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     
-                    // Robust Menu Merge: Ensures hardcoded core updates aren't lost, while keeping custom 'my-recipes'
-                    const savedMenu = parsed.menu || [];
+                    // Safely merge menu: prioritize the official hardcoded menu so no categories are ever lost.
                     const mergedMenu = initialAppData.menu.map(initialCat => {
-                       const savedCat = savedMenu.find(c => c.id === initialCat.id);
+                       const savedCat = parsed.menu?.find(c => c.id === initialCat.id);
                        if (savedCat) {
+                           // Keep user's custom recipes subcategory if it exists
                            const myRecipesSub = savedCat.subcategories?.find(s => s.id === 'my-recipes');
                            if (myRecipesSub) {
                                return { ...initialCat, subcategories: [...initialCat.subcategories, myRecipesSub] };
@@ -1465,15 +1481,24 @@
                        return initialCat;
                     });
 
-                    const safeData = {
+                    // Safely merge recipes: Force all hardcoded recipes to be present, keep user's custom ones.
+                    const mergedRecipes = { ...initialAppData.recipes };
+                    if (parsed.recipes) {
+                        Object.keys(parsed.recipes).forEach(key => {
+                            if (parsed.recipes[key].isCustom) {
+                                mergedRecipes[key] = parsed.recipes[key];
+                            }
+                        });
+                    }
+
+                    return {
                         ...initialAppData,
                         ...parsed,
-                        recipes: { ...initialAppData.recipes, ...(parsed.recipes || {}) },
+                        recipes: mergedRecipes,
                         menu: mergedMenu,
-                        latestUpdates: parsed.latestUpdates && parsed.latestUpdates.length > 0 ? parsed.latestUpdates : initialAppData.latestUpdates,
+                        latestUpdates: initialAppData.latestUpdates, // Force Discover page to stay beautiful
                         trash: parsed.trash || []
                     };
-                    return safeData;
                 }
             } catch (error) {
                 console.error("Failed to parse Local Storage, resetting to defaults:", error);
@@ -1489,47 +1514,6 @@
               try { return JSON.parse(localStorage.getItem('foodMakerQueue')) || []; } 
               catch(e) { return []; }
           }); 
-
-          // Background migration script: Ensures hardcoded recipe updates inject into saved user data safely
-          useEffect(() => {
-             let needsUpdate = false;
-             let newRecipes = { ...appData.recipes };
-             let newLatestUpdates = [ ...appData.latestUpdates ];
-             
-             const recipesToEnsure = [
-                 'cinnamon-apple-cake', 'burger-patty', 'brownies', 'pasta-al-limone',
-                 'canchanchara', 'mojito-cubano', 'pina-colada', 'caipirinha-plus', 
-                 'espresso-banana', 'brazilian-moscow-mule', 'brazilian-mojito'
-             ];
-
-             recipesToEnsure.forEach(id => {
-                 // Check if it's missing entirely or if burger needs the cinnamon update
-                 if (!newRecipes[id] || (id === 'burger-patty' && !newRecipes[id].variations[0].ingredients.find(i => i.id === 'cinnamon'))) {
-                     newRecipes[id] = initialAppData.recipes[id];
-                     needsUpdate = true;
-                 }
-             });
-
-             // Ensure menu is perfectly synced with hardcoded structure to show new categories
-             const mergedMenu = initialAppData.menu.map(initialCat => {
-                 const savedCat = appData.menu.find(c => c.id === initialCat.id);
-                 if (savedCat) {
-                     const myRecipesSub = savedCat.subcategories?.find(s => s.id === 'my-recipes');
-                     if (myRecipesSub) return { ...initialCat, subcategories: [...initialCat.subcategories, myRecipesSub] };
-                 }
-                 return initialCat;
-             });
-
-             // Ensure Discover page has the aligned category icons and proper colors
-             if (appData.latestUpdates.length < 8 || appData.latestUpdates[0].icon === 'fa-mug-hot' || appData.latestUpdates.some(u => u.bg === 'from-[#C3A995] to-[#A8876F]')) {
-                 newLatestUpdates = initialAppData.latestUpdates;
-                 needsUpdate = true;
-             }
-             
-             if (needsUpdate || JSON.stringify(appData.menu) !== JSON.stringify(mergedMenu)) {
-                 setAppData(prev => ({ ...prev, recipes: newRecipes, menu: mergedMenu, latestUpdates: newLatestUpdates }));
-             }
-          }, []);
 
           useEffect(() => localStorage.setItem('foodMakerAppData', JSON.stringify(appData)), [appData]);
           useEffect(() => localStorage.setItem('foodMakerFavs', JSON.stringify(favourites)), [favourites]);
