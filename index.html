@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-	<title>Food Maker</title>
-	<link rel="icon" type="favicon/png" href="favicon.png">
+    <title>Food Maker</title>
+    <link rel="icon" type="favicon/png" href="favicon.png">
 	<link rel="apple-touch-icon" href="favicon.png">
     
-    <!-- Global Error Handler -->
     <script>
         window.addEventListener('error', function(e) {
             const root = document.getElementById('root');
@@ -23,10 +22,8 @@
         });
     </script>
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Tailwind Configuration for Custom Fonts -->
     <script>
       tailwind.config = {
         theme: {
@@ -40,15 +37,11 @@
       }
     </script>
     
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- React & ReactDOM (Cloudflare CDNJS for ultra-high stability) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
-    
-    <!-- Babel -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.6/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.6/babel.min.js" crossorigin="anonymous"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap');
@@ -61,9 +54,16 @@
         body, html {
             margin: 0; padding: 0; height: 100%; width: 100%;
             background-color: #FAF8F5; overscroll-behavior-y: none;
+            -webkit-tap-highlight-color: transparent;
         }
         
         ::-webkit-scrollbar { width: 0px; background: transparent; }
+        
+        .slide-in-right { animation: slideInRight 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        @keyframes slideInRight { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        .fade-in { animation: fadeIn 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -72,20 +72,33 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
+        const categoryColors = {
+            snacks: { bg: 'bg-[#FDBA74]', iconClass: 'fa-cookie-bite', bgColorHex: '#FDBA74' },
+            bread: { bg: 'bg-[#FDE68A]', iconClass: 'fa-bread-slice', bgColorHex: '#FDE68A' },
+            pasta: { bg: 'bg-[#FEF08A]', iconClass: 'fa-bowl-food', bgColorHex: '#FEF08A' },
+            desserts: { bg: 'bg-[#A7F3D0]', iconClass: 'fa-cake-candles', bgColorHex: '#A7F3D0' }, 
+            drinks: { bg: 'bg-[#BAE6FD]', iconClass: 'fa-martini-glass-citrus', bgColorHex: '#BAE6FD' },
+            bbq: { bg: 'bg-[#FCA5A5]', iconClass: 'fa-fire-burner', bgColorHex: '#FCA5A5' },
+            chicken: { bg: 'bg-[#FED7AA]', iconClass: 'fa-drumstick-bite', bgColorHex: '#FED7AA' },
+            veggies: { bg: 'bg-[#BBF7D0]', iconClass: 'fa-leaf', bgColorHex: '#BBF7D0' },
+            seafood: { bg: 'bg-[#A5F3FC]', iconClass: 'fa-fish', bgColorHex: '#A5F3FC' },
+            default: { bg: 'bg-stone-200', iconClass: 'fa-utensils', bgColorHex: '#E7E5E4' }
+        };
+
         const defaultMenu = [
-            { id: "snacks", name: "Snacks", iconClass: "fa-cookie-bite", subcategories: [{ id: "br-snacks", name: "Brazilian Snacks", foods: [{ id: "pao-de-queijo", name: "Pão de Queijo" }] }] },
-            { id: "bread", name: "Bread", iconClass: "fa-bread-slice", subcategories: [] },
-            { id: "chicken", name: "Chicken", iconClass: "fa-drumstick-bite", subcategories: [] },
-            { id: "pasta", name: "Pasta", iconClass: "fa-bowl-food", subcategories: [{ id: "italian", name: "Italian Pasta", foods: [{ id: "pasta-al-limone", name: "Pasta al Limone" }] }] },
-            { id: "veggies", name: "Veggies", iconClass: "fa-leaf", subcategories: [] },
-            { id: "desserts", name: "Desserts", iconClass: "fa-cake-candles", subcategories: [
+            { id: "snacks", name: "Snacks", subcategories: [{ id: "br-snacks", name: "Brazilian Snacks", foods: [{ id: "pao-de-queijo", name: "Pão de Queijo" }] }] },
+            { id: "bread", name: "Bread", subcategories: [] },
+            { id: "chicken", name: "Chicken", subcategories: [] },
+            { id: "pasta", name: "Pasta", subcategories: [{ id: "italian", name: "Italian Pasta", foods: [{ id: "pasta-al-limone", name: "Pasta al Limone" }] }] },
+            { id: "veggies", name: "Veggies", subcategories: [] },
+            { id: "desserts", name: "Desserts", subcategories: [
                 { id: "cakes", name: "Cakes", foods: [{ id: "cinnamon-apple-cake", name: "Cinnamon Apple Cake" }] },
                 { id: "kids-creations", name: "Kids' Creations", foods: [{ id: "gabriels-bolo-crucial", name: "Gabriel's Bolo Crucial" }] },
                 { id: "brownies", name: "Brownies", foods: [{ id: "brownies", name: "Brownies" }] }
               ] 
             },
-            { id: "bbq", name: "BBQ", iconClass: "fa-fire-burner", subcategories: [{ id: "burgers", name: "Burgers", foods: [{ id: "burger-patty", name: "Burger Patty" }] }] },
-            { id: "drinks", name: "Drinks", iconClass: "fa-martini-glass-citrus", subcategories: [
+            { id: "bbq", name: "BBQ", subcategories: [{ id: "burgers", name: "Burgers", foods: [{ id: "burger-patty", name: "Burger Patty" }] }] },
+            { id: "drinks", name: "Drinks", subcategories: [
                  { id: "cocktails", name: "Cocktails", foods: [
                        { id: "canchanchara", name: "Canchanchara" },
                        { id: "mojito-cubano", name: "Mojito Cubano" },
@@ -97,7 +110,7 @@
                  ]}
               ] 
             },
-            { id: "seafood", name: "Seafood", iconClass: "fa-fish", subcategories: [] },
+            { id: "seafood", name: "Seafood", subcategories: [] },
         ];
 
         const defaultRecipes = {
@@ -118,7 +131,6 @@
                     { id: "oil", name: "Oil", baseAmount: 120, unit: "ml", volAmount: 0.5, volUnit: "cups", group: "Cake" },
                     { id: "milk", name: "Milk (room temp)", baseAmount: 240, unit: "ml", volAmount: 1, volUnit: "cups", group: "Cake" },
                     { id: "vanilla", name: "Vanilla Extract", baseAmount: 5, unit: "ml", volAmount: 1, volUnit: "tsp", group: "Cake" },
-                    
                     { id: "white-icing", name: "White Icing", baseAmount: 1, unit: "portions", group: "Assembly" },
                     { id: "coconut-whipped-cream", name: "Coconut Whipped Cream", baseAmount: 1, unit: "portions", group: "Assembly" },
                     { id: "caramel", name: "Caramel (for drizzling)", baseAmount: 1, unit: "portions", group: "Assembly" },
@@ -328,7 +340,7 @@
                     { id: "garlic", name: "Finely grated fresh garlic", baseAmount: 10, unit: "g", volAmount: 2, volUnit: "tsp" },
                     { id: "tomato-paste", name: "Tomato Paste", baseAmount: 10, unit: "g", volAmount: 2, volUnit: "tsp" },
                     { id: "parmesan", name: "Powdered Parmesan", baseAmount: 10, unit: "g", volAmount: 2, volUnit: "tbsp" },
-                    { id: "mushroom", name: "Ground dried mushroom (Costco)", baseAmount: 10, unit: "g", volAmount: 2, volUnit: "tbsp" },
+                    { id: "mushroom", name: "Ground dried mushroom", baseAmount: 10, unit: "g", volAmount: 2, volUnit: "tbsp" },
                     { id: "panko", name: "Panko breadcrumbs", baseAmount: 10, unit: "g", volAmount: 2, volUnit: "tbsp" },
                     { id: "salt", name: "Salt", baseAmount: 5, unit: "g", volAmount: 1, volUnit: "tsp" },
                     { id: "paprika", name: "Smoked Paprika", baseAmount: 3, unit: "g", volAmount: 1, volUnit: "tsp" },
@@ -359,7 +371,7 @@
                     { id: "leite", name: "Milk", baseAmount: 230, unit: "ml", volAmount: 1, volUnit: "cup" },
                     { id: "oleo", name: "Oil", baseAmount: 64, unit: "ml", volAmount: 0.3, volUnit: "cup" },
                     { id: "queijo", name: "Cheese", baseAmount: 150, unit: "g", volAmount: 1.5, volUnit: "cups" },
-                    { id: "ovo", name: "Egg(s)", baseAmount: 2, unit: "units", volAmount: 2, volUnit: "units" },
+                    { id: "ovo", name: "Egg(s)", baseAmount: 2, unit: "units" },
                   ],
                   steps: [
                     "Mix the salt with the tapioca flour.",
@@ -382,7 +394,7 @@
                     { id: "leite-integral", name: "Whole Milk", baseAmount: 560, unit: "ml", volAmount: 2.3, volUnit: "cups" },
                     { id: "manteiga", name: "Butter", baseAmount: 100, unit: "g", volAmount: 7, volUnit: "tbsp" },
                     { id: "sal", name: "Salt", baseAmount: 26, unit: "g", volAmount: 1.5, volUnit: "tbsp" },
-                    { id: "ovo", name: "Egg(s)", baseAmount: 2, unit: "units", volAmount: 2, volUnit: "units" },
+                    { id: "ovo", name: "Egg(s)", baseAmount: 2, unit: "units" },
                   ],
                   steps: [
                     "Heat milk and butter.",
@@ -461,28 +473,15 @@
         };
 
         const defaultDiscover = [
-            { id: '1', type: 'food', foodId: 'gabriels-bolo-crucial', title: "Gabriel's Bolo Crucial", categoryId: 'desserts' },
+            { id: '1', type: 'food', foodId: 'espresso-banana', title: 'Espresso Banana', categoryId: 'drinks' },
             { id: '2', type: 'food', foodId: 'brownies', title: 'Brownies', categoryId: 'desserts' },
-            { id: '3', type: 'food', foodId: 'espresso-banana', title: 'Espresso Banana', categoryId: 'drinks' },
-            { id: '4', type: 'food', foodId: 'pao-de-queijo', title: 'Pão de Queijo', categoryId: 'snacks' },
-            { id: '5', type: 'food', foodId: 'caipirinha-plus', title: 'Caipirinha+', categoryId: 'drinks' },
-            { id: '6', type: 'food', foodId: 'pasta-al-limone', title: 'Pasta al Limone', categoryId: 'pasta' },
-            { id: '7', type: 'food', foodId: 'burger-patty', title: 'Umami Burger', categoryId: 'bbq' },
+            { id: '3', type: 'food', foodId: 'pao-de-queijo', title: 'Pão de Queijo', categoryId: 'snacks' },
+            { id: '4', type: 'food', foodId: 'caipirinha-plus', title: 'Caipirinha+', categoryId: 'drinks' },
+            { id: '5', type: 'food', foodId: 'pasta-al-limone', title: 'Pasta al Limone', categoryId: 'pasta' },
+            { id: '6', type: 'food', foodId: 'gabriels-bolo-crucial', title: 'Gabriel\'s Bolo Crucial', categoryId: 'desserts' },
+            { id: '7', type: 'food', foodId: 'burger-patty', title: 'Umami Burger Patty', categoryId: 'bbq' },
             { id: '8', type: 'food', foodId: 'canchanchara', title: 'Canchanchara', categoryId: 'drinks' }
         ];
-
-        const categoryColors = {
-            snacks: { bg: 'bg-[#FDBA74]', icon: 'text-[#9A3412]' },
-            bread: { bg: 'bg-[#FDE68A]', icon: 'text-[#92400E]' },
-            chicken: { bg: 'bg-[#FECACA]', icon: 'text-[#991B1B]' },
-            pasta: { bg: 'bg-[#FEF08A]', icon: 'text-[#854D0E]' },
-            veggies: { bg: 'bg-[#BBF7D0]', icon: 'text-[#166534]' },
-            desserts: { bg: 'bg-[#A7F3D0]', icon: 'text-[#065F46]' }, 
-            bbq: { bg: 'bg-[#FCA5A5]', icon: 'text-[#7F1D1D]' },
-            drinks: { bg: 'bg-[#BAE6FD]', icon: 'text-[#075985]' }, 
-            seafood: { bg: 'bg-[#A5F3FC]', icon: 'text-[#164E63]' },
-            default: { bg: 'bg-stone-200', icon: 'text-stone-600' }
-        };
 
         const SwipeableItem = ({ children, onDelete }) => {
             const [offset, setOffset] = useState(0);
@@ -507,7 +506,7 @@
                     <div
                         onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}
                         style={{ transform: `translateX(${offset}px)`, transition: touchStartX.current === null ? 'transform 0.2s' : 'none' }}
-                        className="relative z-10 w-full h-full rounded-[1.25rem] bg-[#FAF8F5]"
+                        className="relative z-10 w-full h-full rounded-[1.25rem] bg-transparent"
                     >
                         {children}
                     </div>
@@ -518,7 +517,7 @@
         const CustomAlert = ({ message, onClose }) => {
           if (!message) return null;
           return (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm fade-in" onClick={onClose}>
               <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-sm w-full transform transition-all text-center font-sans" onClick={e => e.stopPropagation()}>
                 <h3 className="font-display text-xl font-bold text-stone-800 mb-2">Notice</h3>
                 <p className="font-sans text-stone-600 mb-6">{message}</p>
@@ -530,73 +529,86 @@
           );
         };
 
-        const Header = ({ onMenuClick, onBack, view, title, isFavourite, toggleFavourite, isQueued, toggleQueue, onShare, onSearchClick, setView }) => {
-          const showBack = view !== 'home';
-          const isMainSubpage = ['favourites', 'queue', 'create', 'trash', 'settings'].includes(view);
+        const ConfirmModal = ({ dialog, onClose }) => {
+            if (!dialog) return null;
+            return (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm fade-in" onClick={onClose}>
+                    <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-sm w-full transform transition-all text-center font-sans" onClick={e => e.stopPropagation()}>
+                        <h3 className="font-display text-xl font-bold text-stone-800 mb-2">Confirm</h3>
+                        <p className="font-sans text-stone-600 mb-6">{dialog.message}</p>
+                        <div className="flex gap-3">
+                            <button onClick={onClose} className="flex-1 bg-stone-100 text-stone-700 font-sans font-bold py-3 rounded-xl active:scale-95 transition-transform">Cancel</button>
+                            <button onClick={() => { dialog.action(); onClose(); }} className="flex-1 bg-amber-50 text-amber-600 font-sans font-bold py-3 rounded-xl active:scale-95 transition-transform">{dialog.confirmText || 'Confirm'}</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
 
+        const Header = ({ onMenuClick, onBack, view, title, isFavourite, toggleFavourite, isQueued, toggleQueue, onShare, onSettingsClick, setView }) => {
+          const showBack = view !== 'home';
+          
           let displayTitle = title;
-          let titleIcon = null;
-          if (view === 'favourites') { displayTitle = 'My Favourites'; titleIcon = 'fa-heart text-rose-500'; }
-          else if (view === 'queue') { displayTitle = 'Up Next'; titleIcon = 'fa-list-check text-amber-500'; }
-          else if (view === 'create') { displayTitle = 'Create Recipe'; titleIcon = 'fa-plus text-stone-500'; }
-          else if (view === 'trash') { displayTitle = 'Trash'; titleIcon = 'fa-trash text-stone-500'; }
-          else if (view === 'settings') { displayTitle = 'Settings & Data'; titleIcon = 'fa-gear text-stone-500'; }
+          let viewIcon = null;
+          if (view === 'favourites') { displayTitle = 'My Favourites'; viewIcon = <i className="fa-solid fa-heart text-rose-500 mr-2 text-lg"></i>; }
+          else if (view === 'queue') { displayTitle = 'Up Next'; viewIcon = <i className="fa-solid fa-list-check text-amber-500 mr-2 text-lg"></i>; }
+          else if (view === 'create') { displayTitle = 'Create Recipe'; viewIcon = <i className="fa-solid fa-plus text-stone-700 mr-2 text-lg"></i>; }
+          else if (view === 'trash') { displayTitle = 'Trash'; viewIcon = <i className="fa-solid fa-trash text-stone-700 mr-2 text-lg"></i>; }
+          else if (view === 'settings') { displayTitle = 'Settings & Data'; viewIcon = <i className="fa-solid fa-gear text-stone-700 mr-2 text-lg"></i>; }
 
           return (
             <header className="h-16 shrink-0 flex items-center justify-between px-4 bg-[#FAF8F5] z-10 relative border-b border-stone-200/50">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 {showBack ? (
-                  <button onClick={onBack} className="p-2 -ml-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors">
+                  <button onClick={onBack} className="p-2 -ml-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors shrink-0">
                     <i className="fa-solid fa-arrow-left text-xl text-stone-700"></i>
                   </button>
                 ) : (
-                  <button onClick={onMenuClick} className="p-2 -ml-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors">
+                  <button onClick={onMenuClick} className="p-2 -ml-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors shrink-0">
                     <i className="fa-solid fa-bars text-xl text-stone-700"></i>
                   </button>
                 )}
-                <h1 className="text-xl font-display font-bold text-stone-800 tracking-tight line-clamp-1 flex items-center gap-2">
-                   {isMainSubpage && titleIcon && <i className={`fa-solid ${titleIcon} text-[1.1rem]`}></i>}
+                <h1 className="text-[1.35rem] font-display font-bold text-stone-800 tracking-tight line-clamp-1 flex items-center">
+                   {viewIcon}
                    {view === 'home' ? 'Food Maker' : displayTitle}
                 </h1>
               </div>
               <div className="flex items-center gap-1">
-                {(view === 'home' || isMainSubpage) && (
-                  <button onClick={onSearchClick} className="p-2 -mr-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors">
-                    <i className="fa-solid fa-magnifying-glass text-xl text-stone-700"></i>
+                {(view === 'home') && (
+                  <button onClick={onSettingsClick} className="p-2 -mr-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors">
+                    <i className="fa-solid fa-gear text-xl text-stone-700"></i>
                   </button>
                 )}
                 {view === 'recipe' && (
-                  <>
+                  <React.Fragment>
                     <button onClick={() => setView('home')} className="p-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors" title="Home">
                       <i className="fa-solid fa-house text-xl text-stone-400 hover:text-stone-700"></i>
                     </button>
-                    {navigator.share && (
-                      <button onClick={onShare} className="p-2 -mr-1 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors" title="Share Recipe">
-                        <i className="fa-solid fa-arrow-up-from-bracket text-xl text-stone-400 hover:text-stone-700"></i>
-                      </button>
-                    )}
+                    <button onClick={onShare} className="p-2 -mr-1 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors" title="Share Recipe">
+                      <i className="fa-solid fa-arrow-up-from-bracket text-xl text-stone-400 hover:text-stone-700"></i>
+                    </button>
                     <button onClick={toggleQueue} className="p-2 -mr-1 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors" title="Add to Up Next">
-                      <i className={`fa-solid fa-list-check text-xl ${isQueued ? 'text-amber-500' : 'text-stone-400 hover:text-amber-500'}`}></i>
+                      <i className={`fa-solid fa-list-check text-xl transition-colors ${isQueued ? 'text-amber-500' : 'text-stone-400 hover:text-amber-500'}`}></i>
                     </button>
                     <button onClick={toggleFavourite} className="p-2 -mr-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors" title="Add to Favourites">
-                      <i className={`fa-solid fa-heart text-xl ${isFavourite ? 'text-rose-500' : 'text-stone-400 hover:text-rose-500'}`}></i>
+                      <i className={`fa-solid fa-heart text-xl transition-colors ${isFavourite ? 'text-rose-500' : 'text-stone-400 hover:text-rose-500'}`}></i>
                     </button>
-                  </>
+                  </React.Fragment>
                 )}
               </div>
             </header>
           );
         };
 
-        const SideMenu = ({ isOpen, onClose, onSelectFood, onOpenFavourites, onOpenQueue, onOpenCreate, onOpenTrash, onOpenSettings, menuData, recipes }) => {
-          const [menuPath, setMenuPath] = useState([]); 
+        const SideMenu = ({ isOpen, onClose, onSelectFood, onOpenFavourites, onOpenQueue, onOpenCreate, onOpenTrash, menuData, recipes }) => {
           const [searchTerm, setSearchTerm] = useState('');
+          const [navStack, setNavStack] = useState(['main']); // 'main', 'category', 'subcategory'
+          const [selectedMenuCat, setSelectedMenuCat] = useState(null); 
+          const [selectedMenuSubCat, setSelectedMenuSubCat] = useState(null); 
 
           useEffect(() => {
-            if (!isOpen) setTimeout(() => { setMenuPath([]); setSearchTerm(''); }, 300);
+            if (!isOpen) setTimeout(() => { setSearchTerm(''); setNavStack(['main']); setSelectedMenuCat(null); setSelectedMenuSubCat(null); }, 300);
           }, [isOpen]);
-
-          const handleBack = () => setMenuPath(prev => prev.slice(0, -1));
 
           const flatFoods = React.useMemo(() => {
               const foods = [];
@@ -610,7 +622,7 @@
                               catName: cat.name, 
                               subName: sub.name,
                               catId: cat.id, 
-                              iconClass: cat.iconClass,
+                              iconClass: categoryColors[cat.id]?.iconClass || 'fa-utensils',
                               searchIndex: `${food.name} ${cat.name} ${sub.name} ${allIngredients}`.toLowerCase()
                           }); 
                       });
@@ -620,159 +632,227 @@
           }, [menuData, recipes]);
 
           const filteredFoods = searchTerm ? flatFoods.filter(f => f.searchIndex.includes(searchTerm.toLowerCase())) : [];
-
-          const renderContent = () => {
-            if (menuPath.length === 0) {
-              return (
-                <div className="flex flex-col h-full bg-[#FAF8F5]">
-                  <div className="px-6 py-4 flex items-center justify-between">
-                    <h2 className="text-2xl font-display font-extrabold text-stone-800 tracking-tight">Menu</h2>
-                    <button onClick={onClose} className="p-2 -mr-2 rounded-full hover:bg-stone-200"><i className="fa-solid fa-xmark text-xl text-stone-500"></i></button>
-                  </div>
-                  
-                  <div className="px-6 py-2 pb-2">
-                    <div className="relative">
-                      <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400"></i>
-                      <input id="menu-search" type="text" placeholder="Search recipes..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full bg-white border border-stone-200 text-stone-700 rounded-lg py-2 pl-10 pr-4 outline-none focus:ring-2 focus:ring-stone-300 font-sans text-[0.95rem] font-medium shadow-sm" />
-                    </div>
-                  </div>
-
-                  {searchTerm ? (
-                      <div className="flex-1 overflow-y-auto py-2 font-sans space-y-0.5">
-                         <h3 className="px-6 py-2 text-[0.65rem] font-bold uppercase tracking-wider text-stone-400 font-sans">Search Results</h3>
-                         {filteredFoods.length > 0 ? filteredFoods.map(food => (
-                             <button key={food.id} onClick={() => { onSelectFood(food.id); onClose(); }} className="w-full flex items-center gap-3 px-6 py-3 hover:bg-stone-100 active:bg-stone-200 transition-colors text-left">
-                                 <i className={`fa-solid ${food.iconClass} w-5 h-5 flex items-center justify-center text-[1.1rem] text-amber-500`}></i>
-                                 <div className="flex-1">
-                                     <div className="font-sans font-semibold text-stone-700 text-[1rem]">{food.name}</div>
-                                     <div className="font-sans text-stone-400 text-[0.8rem]">{food.catName} • {food.subName}</div>
-                                 </div>
-                                 <i className="fa-solid fa-chevron-right text-xs text-stone-300"></i>
-                             </button>
-                         )) : (
-                             <div className="px-6 py-4 text-stone-500 font-sans text-sm">No recipes found.</div>
-                         )}
-                      </div>
-                  ) : (
-                      <div className="flex-1 overflow-y-auto py-2 font-sans space-y-0.5">
-                        <button onClick={() => { onOpenFavourites(); onClose(); }} className="w-full flex items-center gap-3 px-6 py-2.5 hover:bg-stone-100 active:bg-stone-200 transition-colors text-left group">
-                          <i className="fa-solid fa-heart w-5 h-5 flex items-center justify-center text-stone-400 group-hover:text-rose-500 transition-colors"></i>
-                          <span className="font-sans font-semibold text-stone-700 text-[1rem] flex-1">My Favourites</span>
-                        </button>
-                        
-                        <button onClick={() => { onOpenQueue(); onClose(); }} className="w-full flex items-center gap-3 px-6 py-2.5 hover:bg-stone-100 active:bg-stone-200 transition-colors text-left group">
-                          <i className="fa-solid fa-list-check w-5 h-5 flex items-center justify-center text-stone-400 group-hover:text-amber-500 transition-colors"></i>
-                          <span className="font-sans font-semibold text-stone-700 text-[1rem] flex-1">Up Next</span>
-                        </button>
-                        
-                        <button onClick={() => { onOpenCreate(); onClose(); }} className="w-full flex items-center gap-3 px-6 py-2.5 hover:bg-stone-100 active:bg-stone-200 transition-colors text-left group">
-                          <i className="fa-solid fa-plus w-5 h-5 flex items-center justify-center text-stone-400 group-hover:text-stone-800 transition-colors"></i>
-                          <span className="font-sans font-semibold text-stone-700 text-[1rem] flex-1">Create Recipe</span>
-                        </button>
-
-                        <div className="w-full h-px bg-stone-200 my-2"></div>
-
-                        <button onClick={() => { onOpenTrash(); onClose(); }} className="w-full flex items-center gap-3 px-6 py-2.5 hover:bg-stone-100 active:bg-stone-200 transition-colors text-left group">
-                          <i className="fa-solid fa-trash w-5 h-5 flex items-center justify-center text-stone-400 group-hover:text-stone-800 transition-colors"></i>
-                          <span className="font-sans font-semibold text-stone-700 text-[1rem] flex-1">Trash</span>
-                        </button>
-
-                        <button onClick={() => { onOpenSettings(); onClose(); }} className="w-full flex items-center gap-3 px-6 py-2.5 hover:bg-stone-100 active:bg-stone-200 transition-colors text-left group">
-                          <i className="fa-solid fa-gear w-5 h-5 flex items-center justify-center text-stone-400 group-hover:text-stone-800 transition-colors"></i>
-                          <span className="font-sans font-semibold text-stone-700 text-[1rem] flex-1">Settings & Data</span>
-                        </button>
-
-                        <div className="w-full h-px bg-stone-200 my-2"></div>
-                        <h3 className="px-6 py-2 text-[0.65rem] font-bold uppercase tracking-wider text-stone-400 font-sans">Categories</h3>
-
-                        {menuData.map(cat => (
-                          <button key={cat.id} onClick={() => setMenuPath([cat.id])} className="w-full flex items-center gap-3 px-6 py-2.5 hover:bg-stone-100 active:bg-stone-200 transition-colors text-left">
-                            <i className={`fa-solid ${cat.iconClass} w-5 h-5 flex items-center justify-center text-[1.1rem] text-amber-500`}></i>
-                            <span className="font-sans font-semibold text-stone-700 text-[1rem] flex-1">{cat.name}</span>
-                            <i className="fa-solid fa-chevron-right text-xs text-stone-300"></i>
-                          </button>
-                        ))}
-                      </div>
-                  )}
-                </div>
-              );
-            }
-            
-            if (menuPath.length === 1) {
-              const cat = menuData.find(c => c.id === menuPath[0]);
-              return (
-                <div className="flex flex-col h-full bg-[#FAF8F5]">
-                  <div className="px-4 py-4 flex items-center gap-3 border-b border-stone-200">
-                    <button onClick={handleBack} className="p-2 -ml-2 rounded-full hover:bg-stone-200"><i className="fa-solid fa-arrow-left text-xl text-stone-600"></i></button>
-                    <h2 className="text-xl font-display font-bold text-stone-800 tracking-tight">{cat?.name}</h2>
-                  </div>
-                  <div className="flex-1 overflow-y-auto py-2 font-sans space-y-1">
-                    {(!cat?.subcategories || cat.subcategories.length === 0) && <p className="px-6 py-4 text-stone-500 font-sans font-medium text-sm">More coming soon...</p>}
-                    {cat?.subcategories?.map(sub => (
-                      <button key={sub.id} onClick={() => setMenuPath([...menuPath, sub.id])} className="w-full flex items-center gap-4 px-6 py-3 hover:bg-stone-100 active:bg-stone-200 transition-colors text-left">
-                        <span className="font-sans font-semibold text-stone-700 text-[1.05rem] flex-1">{sub.name}</span>
-                        <i className="fa-solid fa-chevron-right text-sm text-stone-300"></i>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              );
-            }
-            
-            if (menuPath.length === 2) {
-              const cat = menuData.find(c => c.id === menuPath[0]);
-              const sub = cat?.subcategories?.find(s => s.id === menuPath[1]);
-              return (
-                <div className="flex flex-col h-full bg-[#FAF8F5]">
-                  <div className="px-4 py-4 flex items-center gap-3 border-b border-stone-200">
-                    <button onClick={handleBack} className="p-2 -ml-2 rounded-full hover:bg-stone-200"><i className="fa-solid fa-arrow-left text-xl text-stone-600"></i></button>
-                    <h2 className="text-xl font-display font-bold text-stone-800 tracking-tight line-clamp-1">{sub?.name}</h2>
-                  </div>
-                  <div className="flex-1 overflow-y-auto py-2 font-sans space-y-1">
-                    {sub?.foods?.map(food => (
-                      <button key={food.id} onClick={() => { onSelectFood(food.id); onClose(); }} className="w-full flex items-center gap-4 px-6 py-3 hover:bg-stone-100 active:bg-stone-200 transition-colors text-left">
-                        <span className="font-sans font-semibold text-stone-700 text-[1.05rem] flex-1">{food.name}</span>
-                        <i className="fa-solid fa-chevron-right text-sm text-stone-300"></i>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              );
-            }
+          
+          const handleBack = () => {
+              const newStack = [...navStack];
+              newStack.pop();
+              if (newStack[newStack.length - 1] === 'main') { setSelectedMenuCat(null); }
+              if (newStack[newStack.length - 1] === 'category') { setSelectedMenuSubCat(null); }
+              setNavStack(newStack);
           };
 
           return (
             <React.Fragment>
               {isOpen && <div className="fixed inset-0 bg-stone-900/40 z-40 backdrop-blur-sm transition-opacity" onClick={onClose} />}
-              <div className={`fixed inset-y-0 left-0 w-[85%] max-w-sm bg-white z-50 transform transition-transform duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${isOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl`}>
-                {renderContent()}
+              <div className={`fixed inset-y-0 left-0 w-[85%] max-w-sm bg-[#FAF8F5] z-50 transform transition-transform duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${isOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl flex flex-col`}>
+                
+                <div className="px-6 py-3 flex items-center justify-between shrink-0 border-b border-stone-200/50 bg-white">
+                  <h2 className="text-2xl font-display font-extrabold text-stone-800 tracking-tight">Menu</h2>
+                  <button onClick={onClose} className="p-2 -mr-2 rounded-full hover:bg-stone-200"><i className="fa-solid fa-xmark text-xl text-stone-500"></i></button>
+                </div>
+                
+                <div className="px-4 py-2 shrink-0 bg-white shadow-sm relative z-10 border-b border-stone-100">
+                  <div className="relative">
+                    <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400"></i>
+                    <input id="menu-search" type="text" placeholder="Search recipes..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full bg-stone-100 border border-stone-200 text-stone-700 rounded-lg py-1.5 pl-10 pr-4 outline-none focus:ring-2 focus:ring-amber-300 font-sans text-[0.95rem] font-medium transition-shadow" />
+                  </div>
+                </div>
+
+                <div className="flex-1 overflow-hidden relative bg-white">
+                    {/* Search Results */}
+                    {searchTerm && (
+                        <div className="absolute inset-0 z-20 overflow-y-auto py-2 font-sans space-y-0.5 bg-white">
+                           <h3 className="px-6 py-1.5 text-[0.65rem] font-bold uppercase tracking-wider text-stone-400 font-sans">Search Results</h3>
+                           {filteredFoods.length > 0 ? filteredFoods.map(food => (
+                               <button key={food.id} onClick={() => { onSelectFood(food.id); onClose(); }} className="w-full flex items-center gap-3 px-6 py-2.5 hover:bg-stone-50 active:bg-stone-100 transition-colors text-left border-b border-stone-100">
+                                   <i className={`fa-solid ${food.iconClass} w-5 h-5 flex items-center justify-center text-[1.1rem] text-amber-500`}></i>
+                                   <div className="flex-1">
+                                       <div className="font-sans font-semibold text-stone-700 text-[1rem]">{food.name}</div>
+                                       <div className="font-sans text-stone-400 text-[0.8rem]">{food.catName} • {food.subName}</div>
+                                   </div>
+                                   <i className="fa-solid fa-chevron-right text-xs text-stone-300"></i>
+                               </button>
+                           )) : (
+                               <div className="px-6 py-4 text-stone-500 font-sans text-sm">No recipes found.</div>
+                           )}
+                        </div>
+                    )}
+
+                    {/* Level 1: Main Menu */}
+                    <div className={`absolute inset-0 overflow-y-auto py-2 font-sans transition-transform duration-300 bg-white ${navStack[navStack.length-1] === 'main' && !searchTerm ? 'translate-x-0' : '-translate-x-full'}`}>
+                      <button onClick={() => { onOpenFavourites(); onClose(); }} className="w-full flex items-center gap-3 px-6 py-2 hover:bg-stone-50 active:bg-stone-100 transition-colors text-left group">
+                        <i className="fa-solid fa-heart w-5 h-5 flex items-center justify-center text-stone-400 group-hover:text-rose-500 transition-colors"></i>
+                        <span className="font-sans font-semibold text-stone-700 text-[1rem] flex-1">My Favourites</span>
+                      </button>
+                      
+                      <button onClick={() => { onOpenQueue(); onClose(); }} className="w-full flex items-center gap-3 px-6 py-2 hover:bg-stone-50 active:bg-stone-100 transition-colors text-left group">
+                        <i className="fa-solid fa-list-check w-5 h-5 flex items-center justify-center text-stone-400 group-hover:text-amber-500 transition-colors"></i>
+                        <span className="font-sans font-semibold text-stone-700 text-[1rem] flex-1">Up Next</span>
+                      </button>
+                      
+                      <button onClick={() => { onOpenCreate(); onClose(); }} className="w-full flex items-center gap-3 px-6 py-2 hover:bg-stone-50 active:bg-stone-100 transition-colors text-left group">
+                        <i className="fa-solid fa-plus w-5 h-5 flex items-center justify-center text-stone-400 group-hover:text-stone-800 transition-colors"></i>
+                        <span className="font-sans font-semibold text-stone-700 text-[1rem] flex-1">Create Recipe</span>
+                      </button>
+
+                      <button onClick={() => { onOpenTrash(); onClose(); }} className="w-full flex items-center gap-3 px-6 py-2 hover:bg-stone-50 active:bg-stone-100 transition-colors text-left group">
+                        <i className="fa-solid fa-trash w-5 h-5 flex items-center justify-center text-stone-400 group-hover:text-stone-800 transition-colors"></i>
+                        <span className="font-sans font-semibold text-stone-700 text-[1rem] flex-1">Trash</span>
+                      </button>
+
+                      <div className="w-full h-px bg-stone-100 my-0.5"></div>
+                      <h3 className="px-6 py-1.5 text-[0.65rem] font-bold uppercase tracking-wider text-stone-400 font-sans">Categories</h3>
+
+                      {menuData.map(cat => (
+                        <button 
+                            key={cat.id}
+                            onClick={() => { setSelectedMenuCat(cat); setNavStack([...navStack, 'category']); }}
+                            className="w-full flex items-center justify-between px-6 py-2 hover:bg-stone-50 active:bg-stone-100 transition-colors text-left group"
+                        >
+                            <div className="flex items-center gap-3">
+                                <i className={`fa-solid ${categoryColors[cat.id]?.iconClass || 'fa-utensils'} w-5 h-5 flex items-center justify-center text-[1.1rem] text-amber-500`}></i>
+                                <span className="font-sans font-bold text-stone-800 text-[1rem] flex-1">{cat.name}</span>
+                            </div>
+                            <i className="fa-solid fa-chevron-right text-stone-300 group-hover:text-stone-400 text-sm"></i>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Level 2: Subcategories */}
+                    <div className={`absolute inset-0 flex flex-col transition-transform duration-300 bg-white z-10 ${navStack[navStack.length-1] === 'category' ? 'translate-x-0' : (navStack.includes('category') && navStack[navStack.length-1] !== 'category' ? '-translate-x-full' : 'translate-x-full')}`}>
+                        <div className="px-4 py-2 border-b border-stone-200 flex items-center gap-2 bg-stone-50 shrink-0 shadow-sm relative z-10">
+                            <button onClick={handleBack} className="p-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors">
+                                <i className="fa-solid fa-arrow-left text-stone-600"></i>
+                            </button>
+                            <div className="flex items-center gap-2">
+                                <i className={`fa-solid ${categoryColors[selectedMenuCat?.id]?.iconClass || 'fa-utensils'} text-amber-500 text-lg`}></i>
+                                <h3 className="font-display font-bold text-stone-800 text-lg leading-none pt-1">{selectedMenuCat?.name}</h3>
+                            </div>
+                        </div>
+                        <div className="flex-1 overflow-y-auto bg-white">
+                            {selectedMenuCat?.subcategories?.map(sub => (
+                                <button 
+                                    key={sub.id} 
+                                    onClick={() => { setSelectedMenuSubCat(sub); setNavStack([...navStack, 'subcategory']); }} 
+                                    className="w-full text-left px-6 py-3.5 font-sans font-bold text-[1.05rem] text-stone-700 hover:bg-stone-50 active:bg-stone-100 transition-colors border-b border-stone-100 flex justify-between items-center group"
+                                >
+                                    <span>{sub.name}</span>
+                                    <i className="fa-solid fa-chevron-right text-stone-300 group-hover:text-stone-400"></i>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Level 3: Foods */}
+                    <div className={`absolute inset-0 flex flex-col transition-transform duration-300 bg-white z-20 ${navStack[navStack.length-1] === 'subcategory' ? 'translate-x-0' : 'translate-x-full'}`}>
+                        <div className="px-4 py-2 border-b border-stone-200 flex items-center gap-2 bg-stone-50 shrink-0 shadow-sm relative z-10">
+                            <button onClick={handleBack} className="p-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors">
+                                <i className="fa-solid fa-arrow-left text-stone-600"></i>
+                            </button>
+                            <h3 className="font-display font-bold text-stone-800 text-lg leading-none pt-1 pl-1">{selectedMenuSubCat?.name}</h3>
+                        </div>
+                        <div className="flex-1 overflow-y-auto bg-white">
+                            {selectedMenuSubCat?.foods?.map(food => (
+                                <button 
+                                    key={food.id} 
+                                    onClick={() => { onSelectFood(food.id); onClose(); }} 
+                                    className="w-full text-left px-6 py-3.5 font-sans font-medium text-[1rem] text-stone-700 hover:bg-stone-50 active:bg-stone-100 transition-colors border-b border-stone-100 flex justify-between items-center group"
+                                >
+                                    <span>{food.name}</span>
+                                    <i className="fa-solid fa-chevron-right text-stone-300 group-hover:text-stone-400"></i>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
               </div>
             </React.Fragment>
           );
         };
 
-        const HomeView = ({ onSelectFood, latestUpdates, menu }) => {
+        const HomeView = ({ onSelectFood, latestUpdates, menu, onReorderDiscover }) => {
+            const [draggedIdx, setDraggedIdx] = useState(null);
+            const [touchPos, setTouchPos] = useState({ x: 0, y: 0 });
+            const longPressTimer = useRef(null);
+            const isDragging = useRef(false);
+            const touchStartPos = useRef({ x: 0, y: 0 });
+
             const getCategoryDetails = (catId) => {
                 const cat = menu.find(c => c.id === catId);
                 const colors = categoryColors[catId] || categoryColors.default;
-                return cat ? { name: cat.name, iconClass: cat.iconClass, bg: colors.bg, iconColor: colors.icon } : { name: '', iconClass: 'fa-utensils', bg: categoryColors.default.bg, iconColor: categoryColors.default.icon };
+                return { name: cat ? cat.name : '', ...colors };
+            };
+
+            useEffect(() => {
+                const handleMove = (e) => {
+                    if (isDragging.current) {
+                        e.preventDefault();
+                        const touch = e.touches[0];
+                        setTouchPos({ x: touch.clientX, y: touch.clientY });
+                    } else if (longPressTimer.current) {
+                        const touch = e.touches[0];
+                        const dx = touch.clientX - touchStartPos.current.x;
+                        const dy = touch.clientY - touchStartPos.current.y;
+                        if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+                            clearTimeout(longPressTimer.current);
+                            longPressTimer.current = null;
+                        }
+                    }
+                };
+                document.addEventListener('touchmove', handleMove, { passive: false });
+                return () => document.removeEventListener('touchmove', handleMove);
+            }, []);
+
+            const handleTouchStart = (e, idx) => {
+                const touch = e.touches[0];
+                touchStartPos.current = { x: touch.clientX, y: touch.clientY };
+                setTouchPos({ x: touch.clientX, y: touch.clientY });
+                longPressTimer.current = setTimeout(() => {
+                    isDragging.current = true;
+                    setDraggedIdx(idx);
+                    if (navigator.vibrate) navigator.vibrate(50);
+                }, 400); 
+            };
+
+            const handleTouchEnd = (e, startIdx) => {
+                clearTimeout(longPressTimer.current);
+                longPressTimer.current = null;
+                if (isDragging.current) {
+                    isDragging.current = false;
+                    const touch = e.changedTouches[0];
+                    const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+                    const dropTarget = elem?.closest('[data-discover-idx]');
+                    
+                    if (dropTarget) {
+                        const dropIdx = parseInt(dropTarget.getAttribute('data-discover-idx'), 10);
+                        if (dropIdx !== startIdx && !isNaN(dropIdx)) {
+                            onReorderDiscover(startIdx, dropIdx);
+                        }
+                    }
+                    setDraggedIdx(null);
+                }
             };
 
             return (
-              <div className="h-full px-4 pb-4 overflow-y-auto flex flex-col">
-                <h2 className="text-2xl font-display font-extrabold text-stone-800 tracking-tight mb-4 mt-2 shrink-0">Discover</h2>
-                <div className="flex-1 grid grid-cols-2 gap-3 pb-8 auto-rows-fr">
-                  {latestUpdates.map(item => {
-                    const { name: catName, iconClass, bg, iconColor } = getCategoryDetails(item.categoryId);
+              <div className="h-full px-4 pb-4 overflow-y-auto flex flex-col relative" style={{ touchAction: draggedIdx !== null ? 'none' : 'auto' }}>
+                <h2 className="text-[1.8rem] font-display font-extrabold text-stone-800 tracking-tight mb-2 mt-4 px-1 shrink-0">Discover</h2>
+                <div className="flex-1 grid grid-cols-2 gap-3 pb-8 auto-rows-fr relative">
+                  {latestUpdates.map((item, index) => {
+                    const { name: catName, iconClass, bg } = getCategoryDetails(item.categoryId);
+                    const isDragged = draggedIdx === index;
                     return (
                       <button
                         key={item.id}
-                        onClick={() => item.type === 'food' ? onSelectFood(item.foodId) : null}
-                        className={`relative rounded-[1.25rem] overflow-hidden flex flex-col items-start justify-end p-4 text-left transition-transform active:scale-95 shadow-sm ${bg} min-h-[140px]`}
+                        data-discover-idx={index}
+                        onTouchStart={(e) => handleTouchStart(e, index)}
+                        onTouchEnd={(e) => handleTouchEnd(e, index)}
+                        onTouchCancel={() => { clearTimeout(longPressTimer.current); isDragging.current = false; setDraggedIdx(null); }}
+                        onClick={() => { if (!isDragging.current && item.type === 'food') onSelectFood(item.foodId); }}
+                        className={`relative rounded-[1.25rem] overflow-hidden flex flex-col items-start justify-end p-4 text-left shadow-sm ${bg} min-h-[140px] transition-transform select-none ${isDragged ? 'opacity-40 scale-95' : 'active:scale-95'}`}
                       >
                         {item.type === 'food' && (
-                           <div className="absolute top-3 right-3 bg-white/50 p-2.5 rounded-full backdrop-blur-sm shadow-sm text-stone-600">
-                              <i className={`fa-solid ${iconClass} ${iconColor} w-4 h-4 flex items-center justify-center`}></i>
+                           <div className="absolute top-3 right-3 bg-white/40 p-2.5 rounded-full backdrop-blur-sm shadow-sm">
+                              <i className={`fa-solid ${iconClass} text-stone-700 opacity-60 w-4 h-4 flex items-center justify-center`}></i>
                            </div>
                         )}
                         <span className="font-display font-bold text-[1.1rem] leading-tight z-10 text-stone-800">
@@ -785,6 +865,20 @@
                     );
                   })}
                 </div>
+
+                {draggedIdx !== null && isDragging.current && (
+                    <div 
+                        className={`fixed pointer-events-none z-[100] shadow-2xl rounded-[1.25rem] p-4 flex flex-col items-start justify-end opacity-90 scale-105 min-h-[140px] w-[calc(50vw-1.25rem)]`}
+                        style={{ left: touchPos.x, top: touchPos.y, transform: 'translate(-50%, -50%)', backgroundColor: getCategoryDetails(latestUpdates[draggedIdx].categoryId).bgColorHex }}
+                    >
+                        <div className="absolute top-3 right-3 bg-white/40 p-2.5 rounded-full backdrop-blur-sm shadow-sm">
+                            <i className={`fa-solid ${getCategoryDetails(latestUpdates[draggedIdx].categoryId).iconClass} text-stone-700 opacity-60 w-4 h-4 flex items-center justify-center`}></i>
+                        </div>
+                        <span className="font-display font-bold text-[1.1rem] leading-tight text-stone-800">
+                            {latestUpdates[draggedIdx].title}
+                        </span>
+                    </div>
+                )}
               </div>
             );
         };
@@ -806,44 +900,25 @@
               <button onClick={() => onSelect(item)} className="bg-white border-2 border-stone-100 rounded-[1.25rem] p-5 text-left shadow-sm hover:border-stone-300 transition-colors flex items-center justify-between group active:scale-[0.98] w-full">
                   <div>
                       <h3 className="font-display text-lg font-bold text-stone-800">{food.name} <span className="text-[0.85rem] font-sans font-normal text-stone-500">({variation.name})</span></h3>
-                  <p className="font-sans text-stone-500 font-medium text-sm mt-1">{subtitle}</p>
-              </div>
-              <i className="fa-solid fa-chevron-right text-stone-300 group-hover:text-stone-500"></i>
-          </button>
-        );
+                      <p className="font-sans text-stone-500 font-medium text-sm mt-1">{subtitle}</p>
+                  </div>
+                  <i className="fa-solid fa-chevron-right text-stone-300 group-hover:text-stone-500"></i>
+              </button>
+          );
         };
 
-        const FavouritesView = ({ favourites, recipes, onSelectSaved, onRemove }) => (
-          <div className="h-full px-4 pb-4 pt-4 overflow-y-auto bg-rose-50/30">
-            {favourites.length === 0 ? (
+        const SavedListView = ({ type, items, recipes, onSelectSaved, onRemove }) => (
+          <div className={`h-full px-4 pb-4 pt-4 overflow-y-auto ${type === 'fav' ? 'bg-rose-50/30' : 'bg-amber-50/30'}`}>
+            {items.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-64 text-stone-400 font-sans text-center px-8">
-                <i className="fa-solid fa-heart text-5xl mb-4 text-rose-200"></i>
-                <p>No favourites yet. Bookmark specific recipes to access them quickly here.</p>
+                <i className={`fa-solid ${type === 'fav' ? 'fa-heart text-rose-200' : 'fa-list-check text-amber-200'} text-5xl mb-4`}></i>
+                <p>No items saved yet.</p>
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                {favourites.map(fav => (
-                    <SwipeableItem key={fav.id} onDelete={() => onRemove(fav.id)}>
-                        <SavedItemCard item={fav} recipes={recipes} onSelect={onSelectSaved} />
-                    </SwipeableItem>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-
-        const UpNextView = ({ queue, recipes, onSelectSaved, onRemove }) => (
-          <div className="h-full px-4 pb-4 pt-4 overflow-y-auto bg-amber-50/30">
-            {queue.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-64 text-stone-400 font-sans text-center px-8">
-                <i className="fa-solid fa-list-check text-5xl mb-4 text-amber-200"></i>
-                <p>Nothing in your queue. Add a recipe to start cooking.</p>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {queue.map(qItem => (
-                    <SwipeableItem key={qItem.id} onDelete={() => onRemove(qItem.id)}>
-                        <SavedItemCard item={qItem} recipes={recipes} onSelect={onSelectSaved} />
+                {items.map(item => (
+                    <SwipeableItem key={item.id} onDelete={() => onRemove(item.id)}>
+                        <SavedItemCard item={item} recipes={recipes} onSelect={onSelectSaved} />
                     </SwipeableItem>
                 ))}
               </div>
@@ -896,7 +971,7 @@
             );
         };
 
-        const TrashView = ({ trash, onRestore, onDeletePerm }) => (
+        const TrashView = ({ trash, onRestore, onDeletePerm, onConfirm }) => (
             <div className="h-full px-4 pb-4 pt-4 overflow-y-auto bg-stone-100/50">
                 {trash.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-64 text-stone-400 font-sans text-center px-8">
@@ -914,9 +989,7 @@
                                 <div className="flex gap-2">
                                     <button onClick={() => onRestore(recipe)} className="flex-1 bg-stone-100 text-stone-800 font-sans font-bold py-2 rounded-lg text-sm active:scale-95 transition-transform">Restore</button>
                                     <button onClick={() => {
-                                        if(window.confirm("Permanently delete this recipe? This cannot be undone.")) {
-                                            onDeletePerm(recipe.id);
-                                        }
+                                        onConfirm("Permanently delete this recipe? This cannot be undone.", () => onDeletePerm(recipe.id));
                                     }} className="flex-1 bg-rose-50 text-rose-700 font-sans font-bold py-2 rounded-lg text-sm active:scale-95 transition-transform">Delete Forever</button>
                                 </div>
                             </div>
@@ -926,7 +999,7 @@
             </div>
         );
 
-        const CreateRecipeView = ({ onSave, categories, recipes, showAlert, editData }) => {
+        const CreateRecipeView = ({ onSave, categories, recipes, showAlert, editData, onConfirm }) => {
           const [sourceRecipeId, setSourceRecipeId] = useState('');
           const [categoryId, setCategoryId] = useState('');
           const [subcategoryId, setSubcategoryId] = useState('');
@@ -973,9 +1046,9 @@
              const val = e.target.value;
              if (!val) {
                  if (foodName || varName || ingredients[0].name || steps[0]) {
-                     if (window.confirm("This will clear all your current inputs. Are you sure?")) {
+                     onConfirm("This will clear all your current inputs. Are you sure?", () => {
                          setSourceRecipeId(''); setFoodName(''); setVarName(''); setBaseYield(''); setYieldUnit(''); setNotes(''); setSource(''); setIngredients([{ name: '', baseAmount: '', unit: '', volAmount: '', volUnit: '', group: '' }]); setSteps(['']);
-                     }
+                     });
                  } else { setSourceRecipeId(''); }
                  return;
              }
@@ -993,12 +1066,18 @@
 
           const handleSave = () => {
             if (!categoryId || !foodName || !varName || baseYield === '' || baseYield === undefined) return showAlert("Please fill the basic details and select a category.");
-            if (subcategoryId === 'NEW' && !newSubName.trim()) return showAlert("Please provide a name for the new sub-category.");
-            if (editData && !window.confirm("Save changes to this recipe?")) return;
+            if (!subcategoryId) return showAlert("Please select a sub-category.");
+            if (subcategoryId === 'NEW' && !(newSubName || '').trim()) return showAlert("Please provide a name for the new sub-category.");
             
-            const finalSubcat = subcategoryId === 'NEW' 
-                ? { id: newSubName.toLowerCase().replace(/\s+/g, '-'), name: newSubName.trim() }
-                : { id: subcategoryId, name: availableSubcategories.find(s => s.id === subcategoryId)?.name || 'Misc' };
+            const activeCat = categories.find(c => c.id === categoryId);
+            const availableSubcategories = activeCat?.subcategories || [];
+            let finalSubcat;
+            
+            if (subcategoryId === 'NEW') {
+                finalSubcat = { id: (newSubName || '').toLowerCase().replace(/\s+/g, '-'), name: (newSubName || '').trim() };
+            } else {
+                finalSubcat = { id: subcategoryId, name: availableSubcategories.find(s => s.id === subcategoryId)?.name || 'Misc' };
+            }
 
             const newRecipe = {
               id: editData ? editData.foodId : foodName.toLowerCase().replace(/\s+/g, '-'),
@@ -1008,18 +1087,31 @@
               variations: [{
                 id: editData ? editData.variation.id : varName.toLowerCase().replace(/\s+/g, '-'),
                 name: varName,
-                description: editData ? editData.variation.description : "Custom recipe created by you.",
+                description: editData ? editData.variation.description : "Custom recipe.",
                 baseYield: parseFloat(baseYield),
                 yieldUnit: yieldUnit || 'portions',
-                notes: notes.trim() ? notes.split('\n').filter(n => n.trim() !== '') : [],
-                source: source.trim() || undefined,
+                notes: (notes || '').trim() ? (notes || '').split('\n').filter(n => (n || '').trim() !== '') : [],
+                source: (source || '').trim() || undefined,
                 ingredients: ingredients.map((ing, i) => ({
-                  id: `ing-${i}`, name: ing.name, baseAmount: parseFloat(ing.baseAmount), unit: ing.unit, volAmount: ing.volAmount ? parseFloat(ing.volAmount) : undefined, volUnit: ing.volUnit || undefined, group: ing.group.trim() || undefined
+                  id: `ing-${i}`, 
+                  name: ing.name, 
+                  baseAmount: parseFloat(ing.baseAmount), 
+                  unit: ing.unit, 
+                  volAmount: ing.volAmount ? parseFloat(ing.volAmount) : undefined, 
+                  volUnit: ing.volUnit || undefined, 
+                  group: (ing.group || '').trim() || undefined
                 })).filter(ing => ing.name && !isNaN(ing.baseAmount)),
-                steps: steps.filter(s => s.trim() !== '')
+                steps: steps.filter(s => (s || '').trim() !== '')
               }]
             };
-            onSave({ newRecipe, categoryId, subcategoryDetails: finalSubcat, isEdit: !!editData });
+
+            if (editData) {
+                onConfirm("Save changes to this recipe?", () => {
+                    onSave({ newRecipe, categoryId, subcategoryDetails: finalSubcat, isEdit: true });
+                });
+            } else {
+                onSave({ newRecipe, categoryId, subcategoryDetails: finalSubcat, isEdit: false });
+            }
           };
 
           const activeCat = categories.find(c => c.id === categoryId);
@@ -1031,7 +1123,7 @@
               <div className="space-y-6">
                 <div className="bg-white p-5 rounded-[1.25rem] shadow-sm border border-stone-200">
                   <h3 className="font-display font-bold text-stone-800 mb-4">Category & Template</h3>
-                  <select className="w-full mb-3 p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none focus:border-stone-400 font-sans text-sm text-stone-700 cursor-pointer disabled:opacity-50" value={categoryId} onChange={e => { setCategoryId(e.target.value); setSubcategoryId(''); setSourceRecipeId(''); }} disabled={!!editData}>
+                  <select className="w-full mb-3 p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none focus:border-stone-400 font-sans text-sm text-stone-700 cursor-pointer disabled:opacity-50" value={categoryId} onChange={e => { setCategoryId(e.target.value); setSubcategoryId(''); setSourceRecipeId(''); }}>
                     <option value="" disabled>1. Select a Category...</option>
                     {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
                   </select>
@@ -1117,7 +1209,7 @@
                   <input className="w-full p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none focus:border-stone-400 font-sans text-[0.95rem] text-stone-700" placeholder="Source URL or Text (Optional)" value={source} onChange={e => setSource(e.target.value)} />
                 </div>
 
-                <button onClick={handleSave} className="w-full bg-stone-900 text-white font-sans font-bold text-lg p-4 rounded-xl flex items-center justify-center gap-2 hover:bg-stone-800 transition-colors">
+                <button onClick={handleSave} className="w-full bg-stone-900 text-white font-sans font-bold text-lg p-4 rounded-xl flex items-center justify-center gap-2 hover:bg-stone-800 transition-colors shadow-sm">
                   <i className="fa-solid fa-floppy-disk"></i> Save Recipe
                 </button>
               </div>
@@ -1125,26 +1217,34 @@
           );
         };
 
-        const VariationsView = ({ food, onSelectVariation, onLongPress, onPinToDiscover, favourites, queue }) => {
-          const timerRef = useRef(null);
-
-          const handlePointerDown = (variationId) => {
-            timerRef.current = setTimeout(() => {
-              onLongPress(food.id, variationId);
-            }, 600);
+        const VariationsView = ({ food, onSelectVariation, onTogglePin, isPinned, favourites, queue, onConfirm, onQuickSave }) => {
+          const longPressTimer = useRef(null);
+          
+          const handleTouchStart = (varId) => {
+              longPressTimer.current = setTimeout(() => {
+                  onQuickSave(food.id, varId);
+              }, 500);
           };
-
-          const handlePointerUp = () => {
-            if (timerRef.current) clearTimeout(timerRef.current);
+          const handleTouchEnd = () => {
+              if (longPressTimer.current) clearTimeout(longPressTimer.current);
           };
 
           return (
-            <div className="h-full p-4 overflow-y-auto pb-20 pt-4 relative">
-              <button onClick={() => onPinToDiscover(food.id)} className="absolute top-4 right-4 bg-white border border-stone-200 p-2 rounded-full shadow-sm active:scale-95 text-stone-400 hover:text-stone-600">
+            <div className="h-full p-4 overflow-y-auto pb-20 pt-4 relative bg-[#FAF8F5]">
+              <button 
+                  onClick={() => {
+                      if(isPinned) {
+                          onConfirm("Remove this recipe from the Discover page?", () => onTogglePin(food.id, true));
+                      } else {
+                          onTogglePin(food.id, false);
+                      }
+                  }} 
+                  type="button"
+                  className={`absolute top-4 right-4 z-20 border p-2 rounded-full shadow-sm active:scale-95 transition-colors ${isPinned ? 'bg-amber-100 border-amber-300 text-amber-700' : 'bg-white border-stone-200 text-stone-400 hover:text-stone-600'}`}>
                   <i className="fa-solid fa-thumbtack w-5 h-5 flex items-center justify-center"></i>
               </button>
 
-              <p className="font-sans text-stone-500 font-medium mb-6 pr-10">Which {food.name} recipe do you want to make today? <br/><span className="text-xs text-stone-400 font-sans">(Tip: Hold down a card to quickly save it)</span></p>
+              <p className="font-sans text-stone-500 font-medium mb-6 pr-10">Which {food.name} recipe do you want to make today? <br/><span className="text-xs text-stone-400 font-sans">(Tip: Tap the pin to add to Discover. Long press to quick save)</span></p>
               
               <div className="space-y-4">
                 {food?.variations?.map(variation => {
@@ -1154,9 +1254,9 @@
                   return (
                     <button
                         key={variation.id}
-                        onPointerDown={() => handlePointerDown(variation.id)}
-                        onPointerUp={handlePointerUp}
-                        onPointerLeave={handlePointerUp}
+                        onTouchStart={() => handleTouchStart(variation.id)}
+                        onTouchEnd={handleTouchEnd}
+                        onTouchMove={handleTouchEnd}
                         onClick={() => onSelectVariation(variation.id)}
                         className="w-full text-left bg-white rounded-[1.25rem] shadow-sm border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all active:scale-[0.98] flex flex-col p-6 touch-action-manipulation select-none relative overflow-hidden"
                     >
@@ -1211,7 +1311,7 @@
           </div>
         );
 
-        const RecipeView = ({ variation, mode, calcParams, setCalcParams, onUpdateVariation, onEditRecipe, onDeleteRecipe }) => {
+        const RecipeView = ({ variation, mode, calcParams, setCalcParams, onUpdateVariation, onEditRecipe, onDeleteRecipe, onConfirm }) => {
           const [draggedId, setDraggedId] = useState(null);
           const [dragOverId, setDragOverId] = useState(null);
           const [checkedIngs, setCheckedIngs] = useState({});
@@ -1282,7 +1382,7 @@
           variation.ingredients.forEach(ing => {
             if (checkedIngs[ing.id]) checkedList.push(ing);
             else {
-                const groupName = ing.group || 'Ingredients';
+                const groupName = (ing.group || '').trim() || 'Ingredients';
                 if (!ingredientGroups[groupName]) ingredientGroups[groupName] = [];
                 ingredientGroups[groupName].push(ing);
             }
@@ -1418,9 +1518,7 @@
                       <i className="fa-solid fa-pen-to-square"></i> Edit
                   </button>
                   <button onClick={() => {
-                      if (window.confirm("Are you sure you want to delete this recipe variation?")) {
-                          onDeleteRecipe(variation.id);
-                      }
+                      onConfirm("Are you sure you want to delete this recipe variation?", () => onDeleteRecipe(variation.id), "Delete");
                   }} className="flex-1 py-3.5 bg-rose-50 text-rose-600 font-sans font-bold rounded-xl active:scale-95 transition-transform flex items-center justify-center gap-2 shadow-sm">
                       <i className="fa-solid fa-trash"></i> Delete
                   </button>
@@ -1437,7 +1535,7 @@
                     const parsed = JSON.parse(saved);
                     const trashIds = (parsed.trash || []).map(t => t.id);
 
-                    const mergedMenu = defaultMenu.map(initialCat => {
+                    let mergedMenu = defaultMenu.map(initialCat => {
                        const savedCat = parsed.menu?.find(c => c.id === initialCat.id);
                        let subcats = initialCat.subcategories.map(sub => ({
                            ...sub, foods: sub.foods.filter(f => !trashIds.includes(f.id))
@@ -1452,6 +1550,23 @@
                        }
                        return { ...initialCat, subcategories: subcats.filter(sub => sub.foods && sub.foods.length > 0) };
                     });
+
+                    const dessertsCat = mergedMenu.find(c => c.id === 'desserts');
+                    if (dessertsCat) {
+                        let myRecipes = dessertsCat.subcategories.find(s => s.id === 'my-recipes');
+                        if (myRecipes && myRecipes.foods.some(f => f.id === 'gabriels-bolo-crucial')) {
+                            myRecipes.foods = myRecipes.foods.filter(f => f.id !== 'gabriels-bolo-crucial');
+                            let kids = dessertsCat.subcategories.find(s => s.id === 'kids-creations');
+                            if (!kids) {
+                                kids = { id: 'kids-creations', name: "Kids' Creations", foods: [] };
+                                dessertsCat.subcategories.push(kids);
+                            }
+                            if (!kids.foods.some(f => f.id === 'gabriels-bolo-crucial')) {
+                                kids.foods.push({ id: 'gabriels-bolo-crucial', name: "Gabriel's Bolo Crucial" });
+                            }
+                        }
+                        dessertsCat.subcategories = dessertsCat.subcategories.filter(s => s.foods.length > 0);
+                    }
 
                     const mergedRecipes = {};
                     Object.keys(defaultRecipes).forEach(key => {
@@ -1494,9 +1609,30 @@
           const [alertMsg, setAlertMsg] = useState(null);
           const [editData, setEditData] = useState(null);
           const [calcParams, setCalcParams] = useState({ targetYield: null, selectedIngId: null, availableAmt: null });
-          const [longPressModal, setLongPressModal] = useState(null);
           const [replaceQueueModal, setReplaceQueueModal] = useState(null);
           const [replaceDiscoverModal, setReplaceDiscoverModal] = useState(null);
+          const [confirmDialog, setConfirmDialog] = useState(null);
+          const [importPrompt, setImportPrompt] = useState(null);
+          const [quickSaveModal, setQuickSaveModal] = useState(null); 
+
+          useEffect(() => {
+              const params = new URLSearchParams(window.location.search);
+              const importStr = params.get('share');
+              if (importStr) {
+                  try {
+                      const decodedStr = decodeURIComponent(atob(importStr));
+                      const decodedData = JSON.parse(decodedStr);
+                      if (decodedData && decodedData.food) {
+                          setImportPrompt(decodedData.food);
+                      }
+                      window.history.replaceState({}, document.title, window.location.pathname);
+                  } catch (e) {
+                      console.error("Import failed:", e);
+                      setAlertMsg("Failed to import the shared recipe. The link might be invalid or corrupted.");
+                      window.history.replaceState({}, document.title, window.location.pathname);
+                  }
+              }
+          }, []);
 
           const handleSelectFood = (id) => { setFoodId(id); setView('variations'); };
           const handleSelectVariation = (id) => { setVariationId(id); setCalcParams({ targetYield: null, selectedIngId: null, availableAmt: null }); setView('calcMode'); };
@@ -1511,8 +1647,7 @@
             if (view === 'recipe') setView('calcMode');
             else if (view === 'calcMode') setView('variations');
             else if (view === 'variations') { setView('home'); setFoodId(null); }
-            else if (['favourites', 'queue', 'settings', 'trash'].includes(view)) setView('home');
-            else if (view === 'create') { setView('home'); setEditData(null); }
+            else if (['favourites', 'queue', 'settings', 'trash', 'create'].includes(view)) setView('home');
           };
 
           const isSavedVar = (list, fId, vId) => list.some(item => item.foodId === fId && item.variationId === vId);
@@ -1544,20 +1679,27 @@
             }
           };
 
-          const handleLongPress = (fId, vId) => setLongPressModal({ foodId: fId, variationId: vId });
-          const addToGenericSaved = (listType) => {
-            if (!longPressModal) return;
-            const isFav = isSavedVar(favourites, longPressModal.foodId, longPressModal.variationId);
-            const isQueued = isSavedVar(queue, longPressModal.foodId, longPressModal.variationId);
-            
-            if (listType === 'fav') {
-                if (isFav) { setAlertMsg("This recipe is already favorited."); } 
-                else { setFavourites(prev => [...prev, { id: Date.now().toString(), foodId: longPressModal.foodId, variationId: longPressModal.variationId, mode: null, targetYield: null, selectedIngId: null, availableAmt: null }]); setAlertMsg("Saved to Favourites!"); }
-            } else {
-                if (isQueued) { setAlertMsg("This recipe is already in Up Next."); } 
-                else { addToQueueWithLimit({ id: Date.now().toString(), foodId: longPressModal.foodId, variationId: longPressModal.variationId, mode: null, targetYield: null, selectedIngId: null, availableAmt: null }); }
-            }
-            setLongPressModal(null);
+          const handleQuickSaveTrigger = (fId, vId) => {
+              setQuickSaveModal({ foodId: fId, varId: vId });
+          };
+
+          const handleConfirmQuickSave = (listType) => {
+              const { foodId, varId } = quickSaveModal;
+              if (listType === 'fav') {
+                  if (isSavedVar(favourites, foodId, varId)) {
+                      setAlertMsg("Already in your Favourites!");
+                  } else {
+                      setFavourites(prev => [...prev, { id: Date.now().toString(), foodId, variationId: varId, mode: null, targetYield: null, selectedIngId: null, availableAmt: null }]);
+                      setAlertMsg("Added to Favourites!");
+                  }
+              } else {
+                  if (isSavedVar(queue, foodId, varId)) {
+                      setAlertMsg("Already in Up Next!");
+                  } else {
+                      addToQueueWithLimit({ id: Date.now().toString(), foodId, variationId: varId, mode: null, targetYield: null, selectedIngId: null, availableAmt: null });
+                  }
+              }
+              setQuickSaveModal(null);
           };
 
           const handlePinToDiscover = (replaceUpdateId) => {
@@ -1576,17 +1718,72 @@
               setReplaceDiscoverModal(null);
           };
 
-          const handleShare = () => {
-             const food = appData.recipes[foodId]; const variation = food.variations.find(v => v.id === variationId);
-             const title = `${food.name} ${variation.name}`;
-             if(navigator.share) navigator.share({ title: title, text: `Check out this recipe for ${title} on Food Maker!` }).catch(err => console.log('Error sharing', err));
+          const handleUnpinFromDiscover = (unpinFoodId) => {
+              setAppData(prev => {
+                  let newUpdates = prev.latestUpdates.filter(u => u.foodId !== unpinFoodId);
+                  const currentIds = newUpdates.map(u => u.foodId);
+                  const availableFoods = Object.values(prev.recipes).filter(f => !currentIds.includes(f.id));
+                  
+                  if (newUpdates.length < 8 && availableFoods.length > 0) {
+                      const fallback = availableFoods[availableFoods.length - 1]; // Grabs most recent
+                      newUpdates.push({ id: Date.now().toString(), type: 'food', foodId: fallback.id, title: fallback.name, categoryId: fallback.categoryId || 'snacks' });
+                  }
+                  return { ...prev, latestUpdates: newUpdates };
+              });
+              setAlertMsg("Removed from Discover Home Screen.");
+          };
+
+          const handleReorderDiscover = (sourceIdx, targetIdx) => {
+              setAppData(prev => {
+                  const newUpdates = [...prev.latestUpdates];
+                  const [moved] = newUpdates.splice(sourceIdx, 1);
+                  newUpdates.splice(targetIdx, 0, moved);
+                  return { ...prev, latestUpdates: newUpdates };
+              });
+          };
+
+          const handleShare = async () => {
+             const food = appData.recipes[foodId]; 
+             const variation = food.variations.find(v => v.id === variationId);
+             const title = `${food.name} - ${variation.name}`;
+             
+             const shareData = { food: food };
+             const encoded = btoa(encodeURIComponent(JSON.stringify(shareData)));
+             const shareUrl = `${window.location.origin}${window.location.pathname}?share=${encoded}`;
+
+             if(navigator.share) {
+                 try {
+                     await navigator.share({ 
+                         title: `Food Maker: ${title}`, 
+                         text: `I want to share this recipe for ${title} with you! Tap the link to instantly add it to your Food Maker app:\n\n`,
+                         url: shareUrl
+                     });
+                 } catch(err) { console.log('Error sharing via native API', err); }
+             } else {
+                 try {
+                     await navigator.clipboard.writeText(`I want to share this recipe for ${title} with you! Tap the link to instantly add it to your Food Maker app: ${shareUrl}`);
+                     setAlertMsg("Share link copied to clipboard!");
+                 } catch(err) {
+                     const textArea = document.createElement("textarea");
+                     textArea.value = shareUrl;
+                     document.body.appendChild(textArea);
+                     textArea.select();
+                     document.execCommand("copy");
+                     document.body.removeChild(textArea);
+                     setAlertMsg("Share link copied to clipboard!");
+                 }
+             }
+          };
+
+          const confirmAction = (message, action, confirmText) => {
+              setConfirmDialog({ message, action, confirmText });
           };
 
           const handleCreateRecipe = ({ newRecipe, categoryId, subcategoryDetails, isEdit }) => {
             setAppData(prev => {
-              let finalMenu = prev.menu;
+              let finalMenu = JSON.parse(JSON.stringify(prev.menu));
               const existingFood = prev.recipes[newRecipe.id];
-              let newUpdates = prev.latestUpdates || [];
+              let newUpdates = [...(prev.latestUpdates || [])];
 
               if (isEdit && existingFood) {
                   finalMenu = finalMenu.map(cat => ({
@@ -1633,6 +1830,21 @@
             setFoodId(newRecipe.id); setView('variations'); setEditData(null); setAlertMsg("Recipe Saved!");
           };
 
+          const confirmImport = () => {
+              const newFood = { ...importPrompt, id: importPrompt.id + '-' + Date.now(), name: importPrompt.name + ' (Shared)', isCustom: true };
+              const catId = newFood.categoryId || 'snacks';
+              const catExists = appData.menu.find(c => c.id === catId);
+              const finalCatId = catExists ? catId : 'snacks';
+              
+              handleCreateRecipe({
+                  newRecipe: newFood,
+                  categoryId: finalCatId,
+                  subcategoryDetails: { id: 'shared-recipes', name: 'Shared Recipes' },
+                  isEdit: false
+              });
+              setImportPrompt(null);
+          };
+
           const handleEditRecipe = (variation) => {
               const food = appData.recipes[foodId];
               const catId = food.categoryId || 'snacks';
@@ -1656,12 +1868,12 @@
                     let newUpdates = prev.latestUpdates.filter(u => u.foodId !== foodId);
                     if (newUpdates.length < 8) {
                         const currentIds = newUpdates.map(u => u.foodId);
-                        const availableIds = Object.keys(prev.recipes).filter(id => id !== foodId && !currentIds.includes(id));
+                        const availableFoods = Object.values(prev.recipes).filter(f => f.id !== foodId && !currentIds.includes(f.id));
                         const slotsToFill = 8 - newUpdates.length;
                         for(let i=0; i<slotsToFill; i++) {
-                            if(availableIds[i]) {
-                                const repl = prev.recipes[availableIds[i]];
-                                newUpdates.push({ id: Date.now().toString() + i, type: 'food', foodId: availableIds[i], title: repl.name, categoryId: repl.categoryId || 'snacks' });
+                            if(availableFoods.length > 0) {
+                                const repl = availableFoods.pop();
+                                newUpdates.push({ id: Date.now().toString() + i, type: 'food', foodId: repl.id, title: repl.name, categoryId: repl.categoryId || 'snacks' });
                             }
                         }
                     }
@@ -1706,49 +1918,46 @@
           const handleDeletePerm = (id) => { setAppData(prev => ({ ...prev, trash: prev.trash.filter(r => r.id !== id) })); setAlertMsg(`Recipe permanently deleted.`); };
           const handleImportData = (importedData) => { setAppData(importedData.appData); setFavourites(importedData.favourites); setQueue(importedData.queue); setView('home'); };
 
-          const handleOpenSearch = () => {
-            setIsMenuOpen(true); setTimeout(() => { const searchInput = document.getElementById('menu-search'); if (searchInput) searchInput.focus(); }, 300);
-          };
-
           let headerTitle = "Food Maker";
           if (view === 'variations' && foodId) headerTitle = appData.recipes[foodId]?.name;
           if (view === 'calcMode') headerTitle = "Calculation";
           if (view === 'recipe' && foodId && variationId) { const food = appData.recipes[foodId]; const variation = food?.variations.find(v => v.id === variationId); headerTitle = `${food?.name} ${variation?.name}`; }
 
           return (
-            <div className="h-full w-full flex flex-col overflow-hidden selection:bg-amber-200 relative">
+            <div className="h-full w-full flex flex-col overflow-hidden selection:bg-amber-200 relative bg-[#FAF8F5]">
               <CustomAlert message={alertMsg} onClose={() => setAlertMsg(null)} />
+              <ConfirmModal dialog={confirmDialog} onClose={() => setConfirmDialog(null)} />
               
               <Header 
                 onMenuClick={() => setIsMenuOpen(true)} onBack={goBack} view={view} title={headerTitle}
                 isFavourite={isSavedVar(favourites, foodId, variationId)} toggleFavourite={toggleFavourite} 
                 isQueued={isSavedVar(queue, foodId, variationId)} toggleQueue={toggleQueue} 
-                onShare={handleShare} onSearchClick={handleOpenSearch} setView={setView}
+                onShare={handleShare} onSettingsClick={() => setView('settings')} setView={setView}
               />
               
               <SideMenu 
                 isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} onSelectFood={handleSelectFood} onOpenFavourites={() => setView('favourites')}
-                onOpenQueue={() => setView('queue')} onOpenCreate={() => { setEditData(null); setView('create'); }} onOpenTrash={() => setView('trash')} onOpenSettings={() => setView('settings')}
+                onOpenQueue={() => setView('queue')} onOpenCreate={() => { setEditData(null); setView('create'); }} onOpenTrash={() => setView('trash')}
                 menuData={appData.menu} recipes={appData.recipes}
               />
 
               <main className="flex-1 overflow-hidden relative">
-                {view === 'home' && <HomeView onSelectFood={handleSelectFood} latestUpdates={appData.latestUpdates} menu={appData.menu} />}
-                {view === 'favourites' && <FavouritesView favourites={favourites} recipes={appData.recipes} onSelectSaved={handleSelectSaved} onRemove={(id) => setFavourites(prev => prev.filter(f => f.id !== id))} />}
-                {view === 'queue' && <UpNextView queue={queue} recipes={appData.recipes} onSelectSaved={handleSelectSaved} onRemove={(id) => setQueue(prev => prev.filter(q => q.id !== id))} />}
-                {view === 'create' && <CreateRecipeView onSave={handleCreateRecipe} categories={appData.menu} recipes={appData.recipes} showAlert={setAlertMsg} editData={editData} />}
+                {view === 'home' && <HomeView onSelectFood={handleSelectFood} latestUpdates={appData.latestUpdates} menu={appData.menu} onReorderDiscover={handleReorderDiscover} />}
+                {view === 'favourites' && <SavedListView type="fav" items={favourites} recipes={appData.recipes} onSelectSaved={handleSelectSaved} onRemove={(id) => setFavourites(prev => prev.filter(f => f.id !== id))} />}
+                {view === 'queue' && <SavedListView type="queue" items={queue} recipes={appData.recipes} onSelectSaved={handleSelectSaved} onRemove={(id) => setQueue(prev => prev.filter(q => q.id !== id))} />}
+                {view === 'create' && <CreateRecipeView onSave={handleCreateRecipe} categories={appData.menu} recipes={appData.recipes} showAlert={setAlertMsg} editData={editData} onConfirm={confirmAction} />}
                 {view === 'settings' && <SettingsView appData={appData} favourites={favourites} queue={queue} onImport={handleImportData} setAlertMsg={setAlertMsg} />}
-                {view === 'trash' && <TrashView trash={appData.trash} onRestore={handleRestoreRecipe} onDeletePerm={handleDeletePerm} />}
-                {view === 'variations' && <VariationsView food={appData.recipes[foodId]} onSelectVariation={handleSelectVariation} onLongPress={handleLongPress} onPinToDiscover={() => setReplaceDiscoverModal(foodId)} favourites={favourites} queue={queue} />}
+                {view === 'trash' && <TrashView trash={appData.trash} onRestore={handleRestoreRecipe} onDeletePerm={handleDeletePerm} onConfirm={confirmAction} />}
+                {view === 'variations' && <VariationsView food={appData.recipes[foodId]} onSelectVariation={handleSelectVariation} onTogglePin={(fId, remove) => remove ? handleUnpinFromDiscover(fId) : setReplaceDiscoverModal(fId)} isPinned={appData.latestUpdates.some(u => u.foodId === foodId)} favourites={favourites} queue={queue} onConfirm={confirmAction} onQuickSave={handleQuickSaveTrigger} />}
                 {view === 'calcMode' && <CalcModeView onSelectMode={handleSelectMode} />}
                 {view === 'recipe' && (
-                  <RecipeView variation={appData.recipes[foodId].variations.find(v => v.id === variationId)} mode={calcMode} calcParams={calcParams} setCalcParams={setCalcParams} onUpdateVariation={(updatedVar) => handleUpdateVariation(foodId, updatedVar)} onEditRecipe={handleEditRecipe} onDeleteRecipe={handleDeleteVariation} />
+                  <RecipeView variation={appData.recipes[foodId].variations.find(v => v.id === variationId)} mode={calcMode} calcParams={calcParams} setCalcParams={setCalcParams} onUpdateVariation={(updatedVar) => handleUpdateVariation(foodId, updatedVar)} onEditRecipe={handleEditRecipe} onDeleteRecipe={handleDeleteVariation} onConfirm={confirmAction} />
                 )}
               </main>
 
               {replaceDiscoverModal && (
-                <div className="fixed inset-0 bg-stone-900/60 z-[70] flex flex-col items-center justify-end p-4 animate-in fade-in" onClick={() => setReplaceDiscoverModal(null)}>
-                    <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom-4 flex flex-col max-h-[80vh]" onClick={e => e.stopPropagation()}>
+                <div className="fixed inset-0 bg-stone-900/60 z-[70] flex flex-col items-center justify-end p-4 fade-in" onClick={() => setReplaceDiscoverModal(null)}>
+                    <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl slide-in-from-bottom-4 flex flex-col max-h-[80vh]" onClick={e => e.stopPropagation()}>
                         <h3 className="font-display font-bold text-xl text-stone-800 mb-2">Pin to Discover</h3>
                         <p className="font-sans text-stone-500 mb-4 text-[0.95rem]">Select a current item to replace on your home screen.</p>
                         <div className="space-y-2 mb-4 overflow-y-auto flex-1 pr-2">
@@ -1767,8 +1976,8 @@
               )}
 
               {replaceQueueModal && (
-                <div className="fixed inset-0 bg-stone-900/60 z-[70] flex items-center justify-center p-4 animate-in fade-in" onClick={() => setReplaceQueueModal(null)}>
-                    <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
+                <div className="fixed inset-0 bg-stone-900/60 z-[70] flex items-center justify-center p-4 fade-in" onClick={() => setReplaceQueueModal(null)}>
+                    <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
                         <h3 className="font-display font-bold text-xl text-stone-800 mb-2">Up Next is Full</h3>
                         <p className="font-sans text-stone-500 mb-4 text-[0.95rem]">You can only have 3 recipes in Up Next. Which one would you like to replace?</p>
                         <div className="space-y-2 mb-4">
@@ -1793,20 +2002,43 @@
                 </div>
               )}
 
-              {longPressModal && (
-                <div className="fixed inset-0 bg-stone-900/60 z-[60] flex items-end justify-center sm:items-center p-4 animate-in fade-in" onClick={() => setLongPressModal(null)}>
-                   <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl transform transition-transform animate-in slide-in-from-bottom-4" onClick={e => e.stopPropagation()}>
-                      <h3 className="font-display font-bold text-xl text-stone-800 mb-4">Quick Save</h3>
-                      <div className="space-y-3 font-sans">
-                         <button onClick={() => addToGenericSaved('fav')} className="w-full bg-rose-50 text-rose-600 font-sans font-bold p-4 rounded-2xl flex items-center gap-3 active:scale-95 transition-transform">
-                            <i className="fa-solid fa-heart text-2xl"></i> My Favourites
-                         </button>
-                         <button onClick={() => addToGenericSaved('queue')} className="w-full bg-amber-50 text-amber-600 font-sans font-bold p-4 rounded-2xl flex items-center gap-3 active:scale-95 transition-transform">
-                            <i className="fa-solid fa-list-check text-2xl"></i> Up Next
-                         </button>
+              {importPrompt && (
+                  <div className="fixed inset-0 bg-stone-900/60 z-[100] flex items-center justify-center p-4 fade-in" onClick={() => setImportPrompt(null)}>
+                      <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center" onClick={e => e.stopPropagation()}>
+                          <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                              <i className="fa-solid fa-download text-amber-500 text-2xl"></i>
+                          </div>
+                          <h3 className="font-display font-bold text-xl text-stone-800 mb-2">Import Recipe</h3>
+                          <p className="font-sans text-stone-500 mb-6 text-[0.95rem]">You received a recipe for <strong>{importPrompt.name}</strong>. Would you like to save it to your app?</p>
+                          <div className="flex gap-3">
+                              <button onClick={() => setImportPrompt(null)} className="flex-1 bg-stone-100 text-stone-700 font-sans font-bold py-3 rounded-xl active:scale-95 transition-transform">
+                                  Cancel
+                              </button>
+                              <button onClick={confirmImport} className="flex-1 bg-stone-900 text-white font-sans font-bold py-3 rounded-xl active:scale-95 transition-transform">
+                                  Import
+                              </button>
+                          </div>
                       </div>
-                   </div>
-                </div>
+                  </div>
+              )}
+
+              {quickSaveModal && (
+                  <div className="fixed inset-0 bg-stone-900/60 z-[100] flex items-end justify-center sm:items-center p-4 fade-in" onClick={() => setQuickSaveModal(null)}>
+                      <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl slide-in-from-bottom-4" onClick={e => e.stopPropagation()}>
+                          <h3 className="font-display font-bold text-xl text-stone-800 mb-4">Quick Save</h3>
+                          <div className="space-y-3 font-sans">
+                              <button onClick={() => handleConfirmQuickSave('fav')} className="w-full bg-rose-50 text-rose-600 font-sans font-bold p-4 rounded-2xl flex items-center gap-3 active:scale-95 transition-transform text-lg">
+                                  <i className="fa-solid fa-heart"></i> My Favourites
+                              </button>
+                              <button onClick={() => handleConfirmQuickSave('queue')} className="w-full bg-amber-50 text-amber-600 font-sans font-bold p-4 rounded-2xl flex items-center gap-3 active:scale-95 transition-transform text-lg">
+                                  <i className="fa-solid fa-list-check"></i> Up Next
+                              </button>
+                              <button onClick={() => setQuickSaveModal(null)} className="w-full bg-stone-100 text-stone-600 font-sans font-bold p-4 rounded-2xl mt-2 active:scale-95 transition-transform text-lg">
+                                  Cancel
+                              </button>
+                          </div>
+                      </div>
+                  </div>
               )}
             </div>
           );
