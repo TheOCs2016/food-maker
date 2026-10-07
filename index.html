@@ -23,7 +23,6 @@
     </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script>
       tailwind.config = {
         theme: {
@@ -42,6 +41,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.6/babel.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js" crossorigin="anonymous"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap');
@@ -71,10 +71,13 @@
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
+        
+        const CURRENT_APP_VERSION = 2; // Incremented to force Discover page update
 
         const categoryColors = {
             snacks: { bg: 'bg-[#FDBA74]', iconClass: 'fa-cookie-bite', bgColorHex: '#FDBA74' },
             bread: { bg: 'bg-[#FDE68A]', iconClass: 'fa-bread-slice', bgColorHex: '#FDE68A' },
+            rice: { bg: 'bg-[#E5E7EB]', iconClass: 'fa-bowl-rice', bgColorHex: '#E5E7EB' },
             pasta: { bg: 'bg-[#FEF08A]', iconClass: 'fa-bowl-food', bgColorHex: '#FEF08A' },
             desserts: { bg: 'bg-[#A7F3D0]', iconClass: 'fa-cake-candles', bgColorHex: '#A7F3D0' }, 
             drinks: { bg: 'bg-[#BAE6FD]', iconClass: 'fa-martini-glass-citrus', bgColorHex: '#BAE6FD' },
@@ -88,8 +91,13 @@
         const defaultMenu = [
             { id: "snacks", name: "Snacks", subcategories: [{ id: "br-snacks", name: "Brazilian Snacks", foods: [{ id: "pao-de-queijo", name: "Pão de Queijo" }] }] },
             { id: "bread", name: "Bread", subcategories: [] },
+            { id: "rice", name: "Rice", subcategories: [{ id: "sushi", name: "Sushi", foods: [{ id: "rice-paper-sushi-rolls", name: "Rice Paper Sushi Rolls" }] }] },
             { id: "chicken", name: "Chicken", subcategories: [] },
-            { id: "pasta", name: "Pasta", subcategories: [{ id: "italian", name: "Italian Pasta", foods: [{ id: "pasta-al-limone", name: "Pasta al Limone" }] }] },
+            { id: "pasta", name: "Pasta", subcategories: [
+                { id: "italian", name: "Italian Pasta", foods: [{ id: "pasta-al-limone", name: "Pasta al Limone" }] },
+                { id: "soups", name: "Soups", foods: [{ id: "italian-penicillin-soup", name: "Italian Penicillin Soup" }] },
+                { id: "gnocchi", name: "Gnocchi", foods: [{ id: "mushroom-creamy-gnocchi", name: "Mushroom Creamy Gnocchi" }] }
+            ] },
             { id: "veggies", name: "Veggies", subcategories: [] },
             { id: "desserts", name: "Desserts", subcategories: [
                 { id: "cakes", name: "Cakes", foods: [{ id: "cinnamon-apple-cake", name: "Cinnamon Apple Cake" }] },
@@ -273,7 +281,7 @@
             "brazilian-mojito": {
               id: "brazilian-mojito", name: "Brazilian Mojito", isCustom: false, categoryId: "drinks",
               variations: [{
-                  id: "strawberry", name: "Strawberry Mojito", description: "A fruity twist on the mojito using cachaça and fresh strawberries.",
+                  id: "strawberry", name: "Strawberry Mojito", description: "A fruity twist on the mojito usando cachaça and fresh strawberries.",
                   baseYield: 1, yieldUnit: "drink",
                   ingredients: [
                     { id: "mint", name: "Punhado de hortelã", baseAmount: 1, unit: "handful" },
@@ -469,18 +477,118 @@
                   notes: ["When checking doneness, test the cake portion, not the apples or cinnamon swirl—the latter are supposed to stay moist and gooey."]
                 }
               ]
+            },
+            "rice-paper-sushi-rolls": {
+              id: "rice-paper-sushi-rolls", name: "Rice Paper Sushi Rolls", isCustom: false, categoryId: "rice",
+              variations: [
+                {
+                  id: "whatgreatgrandmaate", name: "What Great Grandma Ate", description: "Crispy, easy, and gluten-free sushi without seaweed. A fun new take on sushi night.",
+                  baseYield: 8, yieldUnit: "rolls", source: "https://whatgreatgrandmaate.com/rice-paper-sushi-rolls/",
+                  ingredients: [
+                    { id: "cooked-rice", name: "Cooked short grain rice", baseAmount: 2, unit: "cups", group: "Sushi Rice" },
+                    { id: "rice-vinegar", name: "Rice vinegar", baseAmount: 30, unit: "ml", volAmount: 2, volUnit: "tbsp", group: "Sushi Rice" },
+                    { id: "sugar", name: "Sugar", baseAmount: 5, unit: "g", volAmount: 1, volUnit: "tsp", group: "Sushi Rice" },
+                    { id: "sea-salt", name: "Sea salt", baseAmount: 2.5, unit: "g", volAmount: 0.5, volUnit: "tsp", group: "Sushi Rice" },
+                    { id: "canned-tuna", name: "Canned tuna, drained", baseAmount: 280, unit: "g", volAmount: 10, volUnit: "oz", group: "Spicy Tuna" },
+                    { id: "kewpie-mayo", name: "Kewpie mayo (or any mayo)", baseAmount: 45, unit: "g", volAmount: 3, volUnit: "tbsp", group: "Spicy Tuna" },
+                    { id: "sriracha", name: "Sriracha", baseAmount: 15, unit: "g", volAmount: 1, volUnit: "tbsp", group: "Spicy Tuna" },
+                    { id: "rice-paper", name: "Rice paper sheets (8 inch/22cm)", baseAmount: 8, unit: "units", group: "Sushi Rolls" },
+                    { id: "nori", name: "Toasted nori sheet snack", baseAmount: 16, unit: "pieces", group: "Sushi Rolls" },
+                    { id: "cucumber", name: "Persian cucumbers, thinly sliced", baseAmount: 2, unit: "units", group: "Sushi Rolls" },
+                    { id: "carrot", name: "Grated carrot", baseAmount: 1, unit: "cup", group: "Sushi Rolls" },
+                    { id: "avocado", name: "Avocado, thinly sliced", baseAmount: 1, unit: "units", group: "Sushi Rolls" },
+                    { id: "sesame-seeds", name: "Toasted sesame seeds", baseAmount: 1, unit: "portions", group: "Sushi Rolls" },
+                    { id: "avocado-oil", name: "Avocado oil", baseAmount: 1, unit: "portions", group: "Sushi Rolls" },
+                    { id: "soy-sauce", name: "Soy sauce (or tamari)", baseAmount: 30, unit: "ml", volAmount: 2, volUnit: "tbsp", group: "Dipping Sauce" },
+                    { id: "wasabi", name: "Wasabi (optional)", baseAmount: 2.5, unit: "g", volAmount: 0.5, volUnit: "tsp", group: "Dipping Sauce" }
+                  ],
+                  steps: [
+                    "Combine cooked rice, rice vinegar, sugar, and sea salt in a bowl. Stir together and set aside.",
+                    "Add tuna, mayo, and sriracha to a separate bowl and mix. Add more mayo if you prefer it creamier.",
+                    "Prepare a shallow, wide bowl of cold water. Dip 1 rice paper in water for 3-5 seconds, then place on a moist cutting board. Add a toasted nori sheet towards the bottom half of the rice paper.",
+                    "Add 1/4 cup of the sushi rice over the nori, then add 2 tbsp carrots and 2 tbsp of the spicy tuna.",
+                    "Top with a layer of cucumber slices, a layer of sliced avocado, then another toasted nori.",
+                    "To roll, bring the bottom portion of the rice paper up to cover some of the filling, then fold the sides in. Roll up and away from you to wrap tightly.",
+                    "Add a thin layer of toasted sesame seeds to a plate, then roll the sushi roll on the plate to coat lightly. Transfer to a parchment-lined plate and repeat.",
+                    "Heat a nonstick skillet over medium-low heat with a thin layer of avocado oil. Add rolls in a single layer without touching. Cook 3 minutes per side until golden and crispy.",
+                    "Remove from heat and serve with soy sauce and wasabi for dipping."
+                  ]
+                }
+              ]
+            },
+            "italian-penicillin-soup": {
+              id: "italian-penicillin-soup", name: "Italian Penicillin Soup", isCustom: false, categoryId: "pasta",
+              variations: [
+                {
+                  id: "comfort-food", name: "Comfort Food", description: "It's a perfect comfort food, and is often eaten to ward off a cold.",
+                  baseYield: 4, yieldUnit: "portions",
+                  ingredients: [
+                    { id: "broth", name: "Broth", baseAmount: 6, unit: "cups" },
+                    { id: "carrots", name: "Carrots", baseAmount: 4, unit: "units" },
+                    { id: "celery", name: "Stalks celery", baseAmount: 2, unit: "units" },
+                    { id: "onion", name: "Onion", baseAmount: 1, unit: "units" },
+                    { id: "garlic", name: "Garlic cloves", baseAmount: 4, unit: "units" },
+                    { id: "rosemary", name: "Sprigs Rosemary", baseAmount: 2, unit: "units" },
+                    { id: "pastina", name: "Pastina pasta", baseAmount: 1, unit: "cup" },
+                    { id: "lemon", name: "Juice from 1 lemon (optional)", baseAmount: 1, unit: "portions" },
+                    { id: "parsley", name: "Fresh parsley", baseAmount: 1, unit: "portions" },
+                    { id: "salt-pepper", name: "Salt and pepper to taste", baseAmount: 1, unit: "portions" }
+                  ],
+                  steps: [
+                    "Combine broth, carrots, celery, onion, garlic and rosemary to a pot and bring to a boil.",
+                    "Reduce to a simmer and cook for 20-25 minutes.",
+                    "Remove the rosemary sprigs. Take out veges along with 1 cup of broth and add to a blender; blend until smooth.",
+                    "Pour blended veggies back into the pot with the remaining broth and stir to combine. Season with salt, pepper and lemon juice (optional).",
+                    "In a separate pot, cook your pasta.",
+                    "Add cooked pasta to a bowl and pour the soup over it. Top with fresh parsley and Parmesan cheese."
+                  ]
+                }
+              ]
+            },
+            "mushroom-creamy-gnocchi": {
+              id: "mushroom-creamy-gnocchi", name: "Mushroom Creamy Gnocchi", isCustom: false, categoryId: "pasta",
+              variations: [
+                {
+                  id: "creamy-spinach", name: "Creamy Spinach & Mushroom", description: "Mushroom and spinach creamy gnocchi pasta. Goes great with a salad and warm crusty bread.",
+                  baseYield: 4, yieldUnit: "portions",
+                  ingredients: [
+                    { id: "olive-oil-mush", name: "Olive oil", baseAmount: 15, unit: "ml", volAmount: 1, volUnit: "tbsp", group: "Mushroom" },
+                    { id: "butter", name: "Butter", baseAmount: 14, unit: "g", volAmount: 1, volUnit: "tbsp", group: "Mushroom" },
+                    { id: "mushrooms", name: "Mushrooms (baby Bella's)", baseAmount: 450, unit: "g", volAmount: 16, volUnit: "oz", group: "Mushroom" },
+                    { id: "salt-pepper-mush", name: "Salt and pepper", baseAmount: 5, unit: "g", volAmount: 1, volUnit: "tsp", group: "Mushroom" },
+                    { id: "gnocchi", name: "Uncooked gnocchi", baseAmount: 450, unit: "g", volAmount: 16, volUnit: "oz", group: "Gnocchi" },
+                    { id: "olive-oil-gnocchi", name: "Olive oil", baseAmount: 15, unit: "ml", volAmount: 1, volUnit: "tbsp", group: "Gnocchi" },
+                    { id: "garlic-minced", name: "Garlic, minced", baseAmount: 5, unit: "units", group: "Gnocchi" },
+                    { id: "broth-gnocchi", name: "Broth (chicken or vegetable)", baseAmount: 120, unit: "ml", volAmount: 0.5, volUnit: "cup", group: "Gnocchi" },
+                    { id: "heavy-cream", name: "Heavy whipping cream", baseAmount: 240, unit: "ml", volAmount: 1, volUnit: "cup", group: "Gnocchi" },
+                    { id: "oregano", name: "Oregano", baseAmount: 2.5, unit: "g", volAmount: 0.5, volUnit: "tsp", group: "Gnocchi" },
+                    { id: "paprika", name: "Paprika", baseAmount: 2.5, unit: "g", volAmount: 0.5, volUnit: "tsp", group: "Gnocchi" },
+                    { id: "salt-gnocchi", name: "Salt", baseAmount: 2.5, unit: "g", volAmount: 0.5, volUnit: "tsp", group: "Gnocchi" },
+                    { id: "spinach", name: "Spinach", baseAmount: 2, unit: "handful", group: "Gnocchi" },
+                    { id: "chili-flakes", name: "Chili flakes", baseAmount: 2.5, unit: "g", volAmount: 0.5, volUnit: "tsp", group: "Gnocchi" }
+                  ],
+                  steps: [
+                    "Add 1 tbsp olive oil and butter to a pan. Add mushrooms and sauté seasoning with salt, black pepper. Cook until golden about 5 minutes in medium heat and remove half of the mushrooms and reserve.",
+                    "Add 1 tablespoon of olive oil if needed to remaining mushrooms, adding the garlic. Sauté for 30 seconds on low medium heat.",
+                    "Add uncooked gnocchi, broth, heavy whipping cream, salt, oregano, paprika. Mix and cover.",
+                    "Cook covered with a lid for three minutes on medium low heat.",
+                    "Uncover, add spinach, mix well and let everything come together for one to two minutes.",
+                    "Top with the remaining mushrooms and sprinkle chili flakes. Serve while hot."
+                  ]
+                }
+              ]
             }
         };
 
         const defaultDiscover = [
-            { id: '1', type: 'food', foodId: 'espresso-banana', title: 'Espresso Banana', categoryId: 'drinks' },
-            { id: '2', type: 'food', foodId: 'brownies', title: 'Brownies', categoryId: 'desserts' },
-            { id: '3', type: 'food', foodId: 'pao-de-queijo', title: 'Pão de Queijo', categoryId: 'snacks' },
-            { id: '4', type: 'food', foodId: 'caipirinha-plus', title: 'Caipirinha+', categoryId: 'drinks' },
-            { id: '5', type: 'food', foodId: 'pasta-al-limone', title: 'Pasta al Limone', categoryId: 'pasta' },
-            { id: '6', type: 'food', foodId: 'gabriels-bolo-crucial', title: 'Gabriel\'s Bolo Crucial', categoryId: 'desserts' },
+            { id: '1', type: 'food', foodId: 'rice-paper-sushi-rolls', title: 'Rice Paper Sushi Rolls', categoryId: 'rice' },
+            { id: '2', type: 'food', foodId: 'italian-penicillin-soup', title: 'Italian Penicillin Soup', categoryId: 'pasta' },
+            { id: '3', type: 'food', foodId: 'mushroom-creamy-gnocchi', title: 'Mushroom Creamy Gnocchi', categoryId: 'pasta' },
+            { id: '4', type: 'food', foodId: 'gabriels-bolo-crucial', title: 'Gabriel\'s Bolo Crucial', categoryId: 'desserts' },
+            { id: '5', type: 'food', foodId: 'pao-de-queijo', title: 'Pão de Queijo', categoryId: 'snacks' },
+            { id: '6', type: 'food', foodId: 'espresso-banana', title: 'Espresso Banana', categoryId: 'drinks' },
             { id: '7', type: 'food', foodId: 'burger-patty', title: 'Umami Burger Patty', categoryId: 'bbq' },
-            { id: '8', type: 'food', foodId: 'canchanchara', title: 'Canchanchara', categoryId: 'drinks' }
+            { id: '8', type: 'food', foodId: 'pasta-al-limone', title: 'Pasta al Limone', categoryId: 'pasta' }
         ];
 
         const SwipeableItem = ({ children, onDelete }) => {
@@ -545,20 +653,21 @@
             );
         };
 
-        const Header = ({ onMenuClick, onBack, view, title, isFavourite, toggleFavourite, isQueued, toggleQueue, onShare, onSettingsClick, setView }) => {
+        const Header = ({ onMenuClick, onBack, view, title, isFavourite, toggleFavourite, isQueued, toggleQueue, onShare, onAboutClick, setView }) => {
           const showBack = view !== 'home';
           
           let displayTitle = title;
           let viewIcon = null;
-          if (view === 'favourites') { displayTitle = 'My Favourites'; viewIcon = <i className="fa-solid fa-heart text-rose-500 mr-2 text-lg"></i>; }
-          else if (view === 'queue') { displayTitle = 'Up Next'; viewIcon = <i className="fa-solid fa-list-check text-amber-500 mr-2 text-lg"></i>; }
-          else if (view === 'create') { displayTitle = 'Create Recipe'; viewIcon = <i className="fa-solid fa-plus text-stone-700 mr-2 text-lg"></i>; }
-          else if (view === 'trash') { displayTitle = 'Trash'; viewIcon = <i className="fa-solid fa-trash text-stone-700 mr-2 text-lg"></i>; }
-          else if (view === 'settings') { displayTitle = 'Settings & Data'; viewIcon = <i className="fa-solid fa-gear text-stone-700 mr-2 text-lg"></i>; }
+          if (view === 'favourites') { displayTitle = 'My Favourites'; viewIcon = <i className="fa-solid fa-heart text-rose-500 mr-1 text-lg"></i>; }
+          else if (view === 'queue') { displayTitle = 'Up Next'; viewIcon = <i className="fa-solid fa-list-check text-stone-700 mr-1 text-lg"></i>; }
+          else if (view === 'create') { displayTitle = 'Create Recipe'; viewIcon = <i className="fa-solid fa-plus text-stone-700 mr-1 text-lg"></i>; }
+          else if (view === 'trash') { displayTitle = 'Trash'; viewIcon = <i className="fa-solid fa-trash text-stone-700 mr-1 text-lg"></i>; }
+          else if (view === 'settings') { displayTitle = 'Settings & Data'; viewIcon = <i className="fa-solid fa-gear text-stone-700 mr-1 text-lg"></i>; }
+          else if (view === 'about') { displayTitle = 'About'; viewIcon = <i className="fa-solid fa-circle-info text-stone-700 mr-1 text-lg"></i>; }
 
           return (
-            <header className="h-16 shrink-0 flex items-center justify-between px-4 bg-[#FAF8F5] z-10 relative border-b border-stone-200/50">
-              <div className="flex items-center gap-2">
+            <header className="h-16 shrink-0 flex items-center justify-between px-4 bg-[#FAF8F5] z-10 relative border-b border-stone-200/50 gap-3">
+              <div className="flex items-center gap-2 flex-1 min-w-0 pr-2">
                 {showBack ? (
                   <button onClick={onBack} className="p-2 -ml-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors shrink-0">
                     <i className="fa-solid fa-arrow-left text-xl text-stone-700"></i>
@@ -568,16 +677,21 @@
                     <i className="fa-solid fa-bars text-xl text-stone-700"></i>
                   </button>
                 )}
-                <h1 className="text-[1.35rem] font-display font-bold text-stone-800 tracking-tight line-clamp-1 flex items-center">
-                   {viewIcon}
-                   {view === 'home' ? 'Food Maker' : displayTitle}
+                <h1 className="text-[1.35rem] font-display font-bold text-stone-800 tracking-tight flex items-center flex-1 min-w-0">
+                   {viewIcon && <span className="shrink-0">{viewIcon}</span>}
+                   <span className="truncate leading-tight">{view === 'home' ? 'Food Maker' : displayTitle}</span>
                 </h1>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 shrink-0">
                 {(view === 'home') && (
-                  <button onClick={onSettingsClick} className="p-2 -mr-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors">
-                    <i className="fa-solid fa-gear text-xl text-stone-700"></i>
-                  </button>
+                  <React.Fragment>
+                    <button onClick={onAboutClick} className="p-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors" title="About">
+                      <i className="fa-solid fa-circle-info text-xl text-stone-700"></i>
+                    </button>
+                    <button onClick={() => setView('settings')} className="p-2 -mr-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors" title="Settings">
+                      <i className="fa-solid fa-gear text-xl text-stone-700"></i>
+                    </button>
+                  </React.Fragment>
                 )}
                 {view === 'recipe' && (
                   <React.Fragment>
@@ -588,7 +702,7 @@
                       <i className="fa-solid fa-arrow-up-from-bracket text-xl text-stone-400 hover:text-stone-700"></i>
                     </button>
                     <button onClick={toggleQueue} className="p-2 -mr-1 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors" title="Add to Up Next">
-                      <i className={`fa-solid fa-list-check text-xl transition-colors ${isQueued ? 'text-amber-500' : 'text-stone-400 hover:text-amber-500'}`}></i>
+                      <i className={`fa-solid fa-list-check text-xl transition-colors ${isQueued ? 'text-stone-700' : 'text-stone-400 hover:text-stone-700'}`}></i>
                     </button>
                     <button onClick={toggleFavourite} className="p-2 -mr-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors" title="Add to Favourites">
                       <i className={`fa-solid fa-heart text-xl transition-colors ${isFavourite ? 'text-rose-500' : 'text-stone-400 hover:text-rose-500'}`}></i>
@@ -602,7 +716,7 @@
 
         const SideMenu = ({ isOpen, onClose, onSelectFood, onOpenFavourites, onOpenQueue, onOpenCreate, onOpenTrash, menuData, recipes }) => {
           const [searchTerm, setSearchTerm] = useState('');
-          const [navStack, setNavStack] = useState(['main']); // 'main', 'category', 'subcategory'
+          const [navStack, setNavStack] = useState(['main']); 
           const [selectedMenuCat, setSelectedMenuCat] = useState(null); 
           const [selectedMenuSubCat, setSelectedMenuSubCat] = useState(null); 
 
@@ -659,12 +773,11 @@
                 </div>
 
                 <div className="flex-1 overflow-hidden relative bg-white">
-                    {/* Search Results */}
                     {searchTerm && (
                         <div className="absolute inset-0 z-20 overflow-y-auto py-2 font-sans space-y-0.5 bg-white">
                            <h3 className="px-6 py-1.5 text-[0.65rem] font-bold uppercase tracking-wider text-stone-400 font-sans">Search Results</h3>
                            {filteredFoods.length > 0 ? filteredFoods.map(food => (
-                               <button key={food.id} onClick={() => { onSelectFood(food.id); onClose(); }} className="w-full flex items-center gap-3 px-6 py-2.5 hover:bg-stone-50 active:bg-stone-100 transition-colors text-left border-b border-stone-100">
+                               <button key={food.id} onClick={() => { onSelectFood(food.id); onClose(); }} className="w-full flex items-center gap-3 px-6 py-2 hover:bg-stone-50 active:bg-stone-100 transition-colors text-left border-b border-stone-100">
                                    <i className={`fa-solid ${food.iconClass} w-5 h-5 flex items-center justify-center text-[1.1rem] text-amber-500`}></i>
                                    <div className="flex-1">
                                        <div className="font-sans font-semibold text-stone-700 text-[1rem]">{food.name}</div>
@@ -678,7 +791,6 @@
                         </div>
                     )}
 
-                    {/* Level 1: Main Menu */}
                     <div className={`absolute inset-0 overflow-y-auto py-2 font-sans transition-transform duration-300 bg-white ${navStack[navStack.length-1] === 'main' && !searchTerm ? 'translate-x-0' : '-translate-x-full'}`}>
                       <button onClick={() => { onOpenFavourites(); onClose(); }} className="w-full flex items-center gap-3 px-6 py-2 hover:bg-stone-50 active:bg-stone-100 transition-colors text-left group">
                         <i className="fa-solid fa-heart w-5 h-5 flex items-center justify-center text-stone-400 group-hover:text-rose-500 transition-colors"></i>
@@ -686,7 +798,7 @@
                       </button>
                       
                       <button onClick={() => { onOpenQueue(); onClose(); }} className="w-full flex items-center gap-3 px-6 py-2 hover:bg-stone-50 active:bg-stone-100 transition-colors text-left group">
-                        <i className="fa-solid fa-list-check w-5 h-5 flex items-center justify-center text-stone-400 group-hover:text-amber-500 transition-colors"></i>
+                        <i className="fa-solid fa-list-check w-5 h-5 flex items-center justify-center text-stone-400 group-hover:text-stone-800 transition-colors"></i>
                         <span className="font-sans font-semibold text-stone-700 text-[1rem] flex-1">Up Next</span>
                       </button>
                       
@@ -718,7 +830,6 @@
                       ))}
                     </div>
 
-                    {/* Level 2: Subcategories */}
                     <div className={`absolute inset-0 flex flex-col transition-transform duration-300 bg-white z-10 ${navStack[navStack.length-1] === 'category' ? 'translate-x-0' : (navStack.includes('category') && navStack[navStack.length-1] !== 'category' ? '-translate-x-full' : 'translate-x-full')}`}>
                         <div className="px-4 py-2 border-b border-stone-200 flex items-center gap-2 bg-stone-50 shrink-0 shadow-sm relative z-10">
                             <button onClick={handleBack} className="p-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors">
@@ -743,7 +854,6 @@
                         </div>
                     </div>
 
-                    {/* Level 3: Foods */}
                     <div className={`absolute inset-0 flex flex-col transition-transform duration-300 bg-white z-20 ${navStack[navStack.length-1] === 'subcategory' ? 'translate-x-0' : 'translate-x-full'}`}>
                         <div className="px-4 py-2 border-b border-stone-200 flex items-center gap-2 bg-stone-50 shrink-0 shadow-sm relative z-10">
                             <button onClick={handleBack} className="p-2 rounded-full hover:bg-stone-200 active:bg-stone-300 transition-colors">
@@ -786,7 +896,7 @@
             useEffect(() => {
                 const handleMove = (e) => {
                     if (isDragging.current) {
-                        e.preventDefault();
+                        e.preventDefault(); 
                         const touch = e.touches[0];
                         setTouchPos({ x: touch.clientX, y: touch.clientY });
                     } else if (longPressTimer.current) {
@@ -852,7 +962,7 @@
                       >
                         {item.type === 'food' && (
                            <div className="absolute top-3 right-3 bg-white/40 p-2.5 rounded-full backdrop-blur-sm shadow-sm">
-                              <i className={`fa-solid ${iconClass} text-stone-700 opacity-60 w-4 h-4 flex items-center justify-center`}></i>
+                              <i className={`fa-solid ${iconClass} text-stone-700 w-4 h-4 flex items-center justify-center opacity-60`}></i>
                            </div>
                         )}
                         <span className="font-display font-bold text-[1.1rem] leading-tight z-10 text-stone-800">
@@ -908,10 +1018,10 @@
         };
 
         const SavedListView = ({ type, items, recipes, onSelectSaved, onRemove }) => (
-          <div className={`h-full px-4 pb-4 pt-4 overflow-y-auto ${type === 'fav' ? 'bg-rose-50/30' : 'bg-amber-50/30'}`}>
+          <div className={`h-full px-4 pb-4 pt-4 overflow-y-auto ${type === 'fav' ? 'bg-rose-50/30' : 'bg-stone-100/50'}`}>
             {items.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-64 text-stone-400 font-sans text-center px-8">
-                <i className={`fa-solid ${type === 'fav' ? 'fa-heart text-rose-200' : 'fa-list-check text-amber-200'} text-5xl mb-4`}></i>
+                <i className={`fa-solid ${type === 'fav' ? 'fa-heart text-rose-200' : 'fa-list-check text-stone-200'} text-5xl mb-4`}></i>
                 <p>No items saved yet.</p>
               </div>
             ) : (
@@ -971,6 +1081,26 @@
             );
         };
 
+        const AboutView = () => (
+            <div className="h-full px-4 pb-4 pt-4 overflow-y-auto bg-stone-50/50">
+                <div className="bg-white p-8 rounded-[1.25rem] shadow-sm border border-stone-200 text-center flex flex-col items-center">
+                    <div className="w-20 h-20 bg-stone-100 rounded-full flex items-center justify-center mb-4 shadow-inner">
+                        <i className="fa-solid fa-utensils text-3xl text-stone-400"></i>
+                    </div>
+                    <h3 className="font-display font-extrabold text-2xl text-stone-800 mb-2">Food Maker</h3>
+                    <p className="font-sans text-stone-500 mb-8 text-[0.95rem] leading-relaxed">
+                        This is a creation by <strong className="text-stone-700">Tarik Otoch</strong> for personal use.
+                    </p>
+                    <a href="https://www.linkedin.com/in/tarikotoch" target="_blank" rel="noopener noreferrer" className="w-full bg-[#0A66C2] text-white font-sans font-bold py-3.5 rounded-xl active:scale-95 transition-transform flex items-center justify-center gap-2 shadow-sm mb-3">
+                        <i className="fa-brands fa-linkedin text-xl"></i> Connect on LinkedIn
+                    </a>
+                    <a href="https://theocs2016.github.io/cup-maker/" target="_blank" rel="noopener noreferrer" className="w-full bg-stone-800 text-white font-sans font-bold py-3.5 rounded-xl active:scale-95 transition-transform flex items-center justify-center gap-2 shadow-sm">
+                        <i className="fa-solid fa-trophy text-xl"></i> Go to Cup Maker
+                    </a>
+                </div>
+            </div>
+        );
+
         const TrashView = ({ trash, onRestore, onDeletePerm, onConfirm }) => (
             <div className="h-full px-4 pb-4 pt-4 overflow-y-auto bg-stone-100/50">
                 {trash.length === 0 ? (
@@ -989,7 +1119,7 @@
                                 <div className="flex gap-2">
                                     <button onClick={() => onRestore(recipe)} className="flex-1 bg-stone-100 text-stone-800 font-sans font-bold py-2 rounded-lg text-sm active:scale-95 transition-transform">Restore</button>
                                     <button onClick={() => {
-                                        onConfirm("Permanently delete this recipe? This cannot be undone.", () => onDeletePerm(recipe.id));
+                                        onConfirm("Permanently delete this recipe? This cannot be undone.", () => onDeletePerm(recipe.id), "Delete");
                                     }} className="flex-1 bg-rose-50 text-rose-700 font-sans font-bold py-2 rounded-lg text-sm active:scale-95 transition-transform">Delete Forever</button>
                                 </div>
                             </div>
@@ -1035,7 +1165,9 @@
                   setVarName(editData.variation.name);
                   setBaseYield(editData.variation.baseYield);
                   setYieldUnit(editData.variation.yieldUnit || 'portions');
-                  setIngredients(editData.variation.ingredients);
+                  setIngredients(editData.variation.ingredients.map(ing => ({
+                      name: ing.name || '', baseAmount: ing.baseAmount || '', unit: ing.unit || '', volAmount: ing.volAmount || '', volUnit: ing.volUnit || '', group: ing.group || ''
+                  })));
                   setSteps(editData.variation.steps);
                   setNotes(editData.variation.notes ? editData.variation.notes.join('\n') : '');
                   setSource(editData.variation.source || '');
@@ -1048,7 +1180,7 @@
                  if (foodName || varName || ingredients[0].name || steps[0]) {
                      onConfirm("This will clear all your current inputs. Are you sure?", () => {
                          setSourceRecipeId(''); setFoodName(''); setVarName(''); setBaseYield(''); setYieldUnit(''); setNotes(''); setSource(''); setIngredients([{ name: '', baseAmount: '', unit: '', volAmount: '', volUnit: '', group: '' }]); setSteps(['']);
-                     });
+                     }, "Clear Data");
                  } else { setSourceRecipeId(''); }
                  return;
              }
@@ -1060,7 +1192,7 @@
 
              setFoodName(food.name + ' (Copy)'); setVarName(variation.name); setBaseYield(variation.baseYield); setYieldUnit(variation.yieldUnit || 'portions');
              setNotes(variation.notes ? variation.notes.join('\n') : ''); setSource(variation.source || '');
-             setIngredients(variation.ingredients.map(ing => ({ name: ing.name, baseAmount: ing.baseAmount, unit: ing.unit, volAmount: ing.volAmount || '', volUnit: ing.volUnit || '', group: ing.group || '' })));
+             setIngredients(variation.ingredients.map(ing => ({ name: ing.name || '', baseAmount: ing.baseAmount || '', unit: ing.unit || '', volAmount: ing.volAmount || '', volUnit: ing.volUnit || '', group: ing.group || '' })));
              setSteps([...variation.steps]);
           };
 
@@ -1098,7 +1230,7 @@
                   baseAmount: parseFloat(ing.baseAmount), 
                   unit: ing.unit, 
                   volAmount: ing.volAmount ? parseFloat(ing.volAmount) : undefined, 
-                  volUnit: ing.volUnit || undefined, 
+                  volUnit: (ing.volUnit || '').trim() || undefined, 
                   group: (ing.group || '').trim() || undefined
                 })).filter(ing => ing.name && !isNaN(ing.baseAmount)),
                 steps: steps.filter(s => (s || '').trim() !== '')
@@ -1107,8 +1239,8 @@
 
             if (editData) {
                 onConfirm("Save changes to this recipe?", () => {
-                    onSave({ newRecipe, categoryId, subcategoryDetails: finalSubcat, isEdit: true });
-                });
+                    onSave({ newRecipe, categoryId, subcategoryDetails: finalSubcat, isEdit: true, oldSubcatId: editData.subcategoryId });
+                }, "Save");
             } else {
                 onSave({ newRecipe, categoryId, subcategoryDetails: finalSubcat, isEdit: false });
             }
@@ -1234,7 +1366,7 @@
               <button 
                   onClick={() => {
                       if(isPinned) {
-                          onConfirm("Remove this recipe from the Discover page?", () => onTogglePin(food.id, true));
+                          onConfirm("Remove this recipe from the Discover page?", () => onTogglePin(food.id, true), "Remove");
                       } else {
                           onTogglePin(food.id, false);
                       }
@@ -1264,7 +1396,7 @@
                         <div className="flex items-center gap-2">
                             <h3 className="text-xl font-display font-extrabold text-stone-800 transition-colors">{variation.name}</h3>
                             {isFav && <i className="fa-solid fa-heart text-rose-500 text-sm"></i>}
-                            {isQueued && <i className="fa-solid fa-list-check text-amber-500 text-sm"></i>}
+                            {isQueued && <i className="fa-solid fa-list-check text-stone-700 text-sm"></i>}
                         </div>
                         <i className="fa-solid fa-chevron-right text-stone-300 transition-colors"></i>
                         </div>
@@ -1551,6 +1683,7 @@
                        return { ...initialCat, subcategories: subcats.filter(sub => sub.foods && sub.foods.length > 0) };
                     });
 
+                    // Auto-migrate Gabriel's Bolo Crucial back to Kids' Creations if needed
                     const dessertsCat = mergedMenu.find(c => c.id === 'desserts');
                     if (dessertsCat) {
                         let myRecipes = dessertsCat.subcategories.find(s => s.id === 'my-recipes');
@@ -1584,14 +1717,20 @@
                         });
                     }
 
-                    return { recipes: mergedRecipes, menu: mergedMenu, latestUpdates: parsed.latestUpdates || defaultDiscover, trash: parsed.trash || [] };
+                    let updates = parsed.latestUpdates || defaultDiscover;
+                    // Force a one-time Discover page reset if they are on an old version (to show new recipes)
+                    if (!parsed.version || parsed.version < CURRENT_APP_VERSION) {
+                        updates = defaultDiscover;
+                    }
+
+                    return { recipes: mergedRecipes, menu: mergedMenu, latestUpdates: updates, trash: parsed.trash || [], version: CURRENT_APP_VERSION };
                 }
             } catch (error) { console.error("Failed to parse Local Storage", error); }
             
             const initialCleanMenu = defaultMenu.map(cat => ({
                 ...cat, subcategories: cat.subcategories.filter(sub => sub.foods && sub.foods.length > 0)
             }));
-            return { menu: initialCleanMenu, recipes: defaultRecipes, latestUpdates: defaultDiscover, trash: [] };
+            return { menu: initialCleanMenu, recipes: defaultRecipes, latestUpdates: defaultDiscover, trash: [], version: CURRENT_APP_VERSION };
           });
           
           const [favourites, setFavourites] = useState(() => { try { return JSON.parse(localStorage.getItem('foodMakerFavs')) || []; } catch(e) { return []; } }); 
@@ -1620,11 +1759,52 @@
               const importStr = params.get('share');
               if (importStr) {
                   try {
-                      const decodedStr = decodeURIComponent(atob(importStr));
-                      const decodedData = JSON.parse(decodedStr);
-                      if (decodedData && decodedData.food) {
-                          setImportPrompt(decodedData.food);
+                      let decodedStr;
+                      if (window.LZString) {
+                          decodedStr = window.LZString.decompressFromEncodedURIComponent(importStr);
+                      } else {
+                          try { decodedStr = decodeURIComponent(atob(importStr)); } catch (e) {
+                              try { decodedStr = decodeURIComponent(escape(atob(decodeURIComponent(importStr)))); } catch(e2) {}
+                          }
                       }
+                      
+                      if (!decodedStr) throw new Error("Could not decode share link");
+                      
+                      const decodedData = JSON.parse(decodedStr);
+                      let newFood = null;
+
+                      if (decodedData.p) {
+                          // Unpack extremely minified recipe data
+                          const p = decodedData.p;
+                          newFood = {
+                              id: 'shared-' + Date.now(),
+                              name: p.n + ' (Shared)',
+                              categoryId: p.c,
+                              isCustom: true,
+                              variations: [{
+                                  id: 'var-' + Date.now(),
+                                  name: p.v.n,
+                                  description: p.v.d,
+                                  baseYield: p.v.y,
+                                  yieldUnit: p.v.u,
+                                  ingredients: p.v.i.map((ig, idx) => ({
+                                      id: 'ing-' + idx,
+                                      name: ig[0], baseAmount: ig[1], unit: ig[2],
+                                      volAmount: ig[3] !== '' ? parseFloat(ig[3]) : undefined,
+                                      volUnit: ig[4] !== '' ? ig[4] : undefined,
+                                      group: ig[5] !== '' ? ig[5] : undefined
+                                  })),
+                                  steps: p.v.s,
+                                  notes: p.v.nt,
+                                  source: p.v.sr
+                              }]
+                          };
+                      } else if (decodedData.food) {
+                          // Fallback for older share links
+                          newFood = { ...decodedData.food, id: decodedData.food.id + '-' + Date.now(), name: decodedData.food.name + ' (Shared)', isCustom: true };
+                      }
+
+                      if (newFood) setImportPrompt(newFood);
                       window.history.replaceState({}, document.title, window.location.pathname);
                   } catch (e) {
                       console.error("Import failed:", e);
@@ -1647,7 +1827,7 @@
             if (view === 'recipe') setView('calcMode');
             else if (view === 'calcMode') setView('variations');
             else if (view === 'variations') { setView('home'); setFoodId(null); }
-            else if (['favourites', 'queue', 'settings', 'trash', 'create'].includes(view)) setView('home');
+            else if (['favourites', 'queue', 'settings', 'trash', 'create', 'about'].includes(view)) setView('home');
           };
 
           const isSavedVar = (list, fId, vId) => list.some(item => item.foodId === fId && item.variationId === vId);
@@ -1725,7 +1905,7 @@
                   const availableFoods = Object.values(prev.recipes).filter(f => !currentIds.includes(f.id));
                   
                   if (newUpdates.length < 8 && availableFoods.length > 0) {
-                      const fallback = availableFoods[availableFoods.length - 1]; // Grabs most recent
+                      const fallback = availableFoods[availableFoods.length - 1];
                       newUpdates.push({ id: Date.now().toString(), type: 'food', foodId: fallback.id, title: fallback.name, categoryId: fallback.categoryId || 'snacks' });
                   }
                   return { ...prev, latestUpdates: newUpdates };
@@ -1747,8 +1927,29 @@
              const variation = food.variations.find(v => v.id === variationId);
              const title = `${food.name} - ${variation.name}`;
              
-             const shareData = { food: food };
-             const encoded = btoa(encodeURIComponent(JSON.stringify(shareData)));
+             // Extreme minification mapping to reduce string length
+             const packed = {
+                 n: food.name,
+                 c: food.categoryId || 'snacks',
+                 v: {
+                     n: variation.name,
+                     d: variation.description || '',
+                     y: variation.baseYield,
+                     u: variation.yieldUnit,
+                     i: variation.ingredients.map(ig => [ig.name, ig.baseAmount, ig.unit, ig.volAmount||'', ig.volUnit||'', ig.group||'']),
+                     s: variation.steps,
+                     nt: variation.notes || [],
+                     sr: variation.source || ''
+                 }
+             };
+
+             let encoded;
+             if (window.LZString) {
+                 encoded = window.LZString.compressToEncodedURIComponent(JSON.stringify({p: packed}));
+             } else {
+                 encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify({p: packed})))));
+             }
+             
              const shareUrl = `${window.location.origin}${window.location.pathname}?share=${encoded}`;
 
              if(navigator.share) {
@@ -1779,7 +1980,7 @@
               setConfirmDialog({ message, action, confirmText });
           };
 
-          const handleCreateRecipe = ({ newRecipe, categoryId, subcategoryDetails, isEdit }) => {
+          const handleCreateRecipe = ({ newRecipe, categoryId, subcategoryDetails, isEdit, oldSubcatId }) => {
             setAppData(prev => {
               let finalMenu = JSON.parse(JSON.stringify(prev.menu));
               const existingFood = prev.recipes[newRecipe.id];
@@ -1921,7 +2122,7 @@
           let headerTitle = "Food Maker";
           if (view === 'variations' && foodId) headerTitle = appData.recipes[foodId]?.name;
           if (view === 'calcMode') headerTitle = "Calculation";
-          if (view === 'recipe' && foodId && variationId) { const food = appData.recipes[foodId]; const variation = food?.variations.find(v => v.id === variationId); headerTitle = `${food?.name} ${variation?.name}`; }
+          if (view === 'recipe' && foodId && variationId) { const food = appData.recipes[foodId]; const variation = food?.variations.find(v => v.id === variationId); headerTitle = `${food?.name} - ${variation?.name}`; }
 
           return (
             <div className="h-full w-full flex flex-col overflow-hidden selection:bg-amber-200 relative bg-[#FAF8F5]">
@@ -1932,7 +2133,7 @@
                 onMenuClick={() => setIsMenuOpen(true)} onBack={goBack} view={view} title={headerTitle}
                 isFavourite={isSavedVar(favourites, foodId, variationId)} toggleFavourite={toggleFavourite} 
                 isQueued={isSavedVar(queue, foodId, variationId)} toggleQueue={toggleQueue} 
-                onShare={handleShare} onSettingsClick={() => setView('settings')} setView={setView}
+                onShare={handleShare} onAboutClick={() => setView('about')} setView={setView}
               />
               
               <SideMenu 
@@ -1947,6 +2148,7 @@
                 {view === 'queue' && <SavedListView type="queue" items={queue} recipes={appData.recipes} onSelectSaved={handleSelectSaved} onRemove={(id) => setQueue(prev => prev.filter(q => q.id !== id))} />}
                 {view === 'create' && <CreateRecipeView onSave={handleCreateRecipe} categories={appData.menu} recipes={appData.recipes} showAlert={setAlertMsg} editData={editData} onConfirm={confirmAction} />}
                 {view === 'settings' && <SettingsView appData={appData} favourites={favourites} queue={queue} onImport={handleImportData} setAlertMsg={setAlertMsg} />}
+                {view === 'about' && <AboutView />}
                 {view === 'trash' && <TrashView trash={appData.trash} onRestore={handleRestoreRecipe} onDeletePerm={handleDeletePerm} onConfirm={confirmAction} />}
                 {view === 'variations' && <VariationsView food={appData.recipes[foodId]} onSelectVariation={handleSelectVariation} onTogglePin={(fId, remove) => remove ? handleUnpinFromDiscover(fId) : setReplaceDiscoverModal(fId)} isPinned={appData.latestUpdates.some(u => u.foodId === foodId)} favourites={favourites} queue={queue} onConfirm={confirmAction} onQuickSave={handleQuickSaveTrigger} />}
                 {view === 'calcMode' && <CalcModeView onSelectMode={handleSelectMode} />}
