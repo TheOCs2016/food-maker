@@ -71,8 +71,6 @@
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
-        
-        const CURRENT_APP_VERSION = 2; // Incremented to force Discover page update
 
         const categoryColors = {
             snacks: { bg: 'bg-[#FDBA74]', iconClass: 'fa-cookie-bite', bgColorHex: '#FDBA74' },
@@ -100,7 +98,7 @@
             ] },
             { id: "veggies", name: "Veggies", subcategories: [] },
             { id: "desserts", name: "Desserts", subcategories: [
-                { id: "cakes", name: "Cakes", foods: [{ id: "cinnamon-apple-cake", name: "Cinnamon Apple Cake" }] },
+                { id: "cakes", name: "Cakes", foods: [{ id: "cinnamon-apple-cake", name: "Cinnamon Apple Cake" }, { id: "bolo-luiz-felipe", name: "Bolo Luiz Felipe" }] },
                 { id: "kids-creations", name: "Kids' Creations", foods: [{ id: "gabriels-bolo-crucial", name: "Gabriel's Bolo Crucial" }] },
                 { id: "brownies", name: "Brownies", foods: [{ id: "brownies", name: "Brownies" }] }
               ] 
@@ -122,6 +120,34 @@
         ];
 
         const defaultRecipes = {
+            "bolo-luiz-felipe": {
+              id: "bolo-luiz-felipe", name: "Bolo Luiz Felipe", isCustom: false, categoryId: "desserts",
+              variations: [
+                {
+                  id: "rachel-de-queiroz", name: "By Rachel de Queiroz", description: "A famous Brazilian dense cake (bolo mole) based on cheese, coconut milk, and butter.",
+                  baseYield: 12, yieldUnit: "slices", source: "http://enfiandoacolher.blogspot.com/2011/01/bolo-luiz-felipe-by-escritora-rachel-de.html",
+                  ingredients: [
+                    { id: "gemas", name: "Gemas", baseAmount: 10, unit: "units" },
+                    { id: "claras", name: "Claras", baseAmount: 4, unit: "units" },
+                    { id: "acucar", name: "Açúcar", baseAmount: 1000, unit: "g", volAmount: 5, volUnit: "xícaras" },
+                    { id: "farinha", name: "Farinha de trigo peneirada", baseAmount: 300, unit: "g", volAmount: 2.5, volUnit: "xícaras" },
+                    { id: "queijo", name: "Queijo ralado (coalho ou reino)", baseAmount: 100, unit: "g", volAmount: 1, volUnit: "pires cheio" },
+                    { id: "manteiga", name: "Manteiga", baseAmount: 400, unit: "g", volAmount: 2, volUnit: "xícaras" },
+                    { id: "leite-coco", name: "Leite de coco (fresco de preferência)", baseAmount: 200, unit: "ml", volAmount: 1, volUnit: "copo" }
+                  ],
+                  steps: [
+                    "Bata bem as gemas.",
+                    "Bata bem as claras em neve (separadas das gemas).",
+                    "Enquanto isso faça uma calda com o açúcar, mas sem deixar escurecer.",
+                    "Com a calda fervente, tire-a do fogo e junte as gemas e mexa vigorosamente.",
+                    "Em seguida, junte as claras e continue mexendo sem parar, enquanto acrescenta o leite de coco, a manteiga, o queijo e por último a farinha de trigo bem peneirada e ao poucos.",
+                    "Besunte uma forma com manteiga e enfarinhe-a.",
+                    "Ponha a massa na forma e leve-a ao forno bem quente (180ºC) por 45min. Até ele dourar por cima.",
+                    "Para que o bolo não murche, deixe-o esfriar dentro do forno."
+                  ]
+                }
+              ]
+            },
             "gabriels-bolo-crucial": {
               id: "gabriels-bolo-crucial", name: "Gabriel's Bolo Crucial", isCustom: false, categoryId: "desserts",
               variations: [
@@ -398,7 +424,8 @@
                   ingredients: [
                     { id: "polvilho-azedo", name: "Sour Tapioca Flour", baseAmount: 440, unit: "g", volAmount: 3.5, volUnit: "cups" },
                     { id: "polvilho-doce", name: "Sweet Tapioca Flour", baseAmount: 220, unit: "g", volAmount: 1.75, volUnit: "cups" },
-                    { id: "queijo-cura", name: "Half-cured cheese (grated)", baseAmount: 540, unit: "g", volAmount: 5, volUnit: "cups" },
+                    { id: "queijo-cura", name: "Half-cured cheese (grated)", baseAmount: 450, unit: "g" },
+                    { id: "parmesan", name: "Grated Parmesan cheese (Kraft)", baseAmount: 100, unit: "g" },
                     { id: "leite-integral", name: "Whole Milk", baseAmount: 560, unit: "ml", volAmount: 2.3, volUnit: "cups" },
                     { id: "manteiga", name: "Butter", baseAmount: 100, unit: "g", volAmount: 7, volUnit: "tbsp" },
                     { id: "sal", name: "Salt", baseAmount: 26, unit: "g", volAmount: 1.5, volUnit: "tbsp" },
@@ -581,14 +608,14 @@
         };
 
         const defaultDiscover = [
-            { id: '1', type: 'food', foodId: 'rice-paper-sushi-rolls', title: 'Rice Paper Sushi Rolls', categoryId: 'rice' },
-            { id: '2', type: 'food', foodId: 'italian-penicillin-soup', title: 'Italian Penicillin Soup', categoryId: 'pasta' },
-            { id: '3', type: 'food', foodId: 'mushroom-creamy-gnocchi', title: 'Mushroom Creamy Gnocchi', categoryId: 'pasta' },
-            { id: '4', type: 'food', foodId: 'gabriels-bolo-crucial', title: 'Gabriel\'s Bolo Crucial', categoryId: 'desserts' },
+            { id: '1', type: 'food', foodId: 'bolo-luiz-felipe', title: 'Bolo Luiz Felipe', categoryId: 'desserts' },
+            { id: '2', type: 'food', foodId: 'rice-paper-sushi-rolls', title: 'Rice Paper Sushi Rolls', categoryId: 'rice' },
+            { id: '3', type: 'food', foodId: 'italian-penicillin-soup', title: 'Italian Penicillin Soup', categoryId: 'pasta' },
+            { id: '4', type: 'food', foodId: 'mushroom-creamy-gnocchi', title: 'Mushroom Creamy Gnocchi', categoryId: 'pasta' },
             { id: '5', type: 'food', foodId: 'pao-de-queijo', title: 'Pão de Queijo', categoryId: 'snacks' },
-            { id: '6', type: 'food', foodId: 'espresso-banana', title: 'Espresso Banana', categoryId: 'drinks' },
+            { id: '6', type: 'food', foodId: 'gabriels-bolo-crucial', title: 'Gabriel\'s Bolo Crucial', categoryId: 'desserts' },
             { id: '7', type: 'food', foodId: 'burger-patty', title: 'Umami Burger Patty', categoryId: 'bbq' },
-            { id: '8', type: 'food', foodId: 'pasta-al-limone', title: 'Pasta al Limone', categoryId: 'pasta' }
+            { id: '8', type: 'food', foodId: 'caipirinha-plus', title: 'Caipirinha+', categoryId: 'drinks' }
         ];
 
         const SwipeableItem = ({ children, onDelete }) => {
@@ -1165,9 +1192,7 @@
                   setVarName(editData.variation.name);
                   setBaseYield(editData.variation.baseYield);
                   setYieldUnit(editData.variation.yieldUnit || 'portions');
-                  setIngredients(editData.variation.ingredients.map(ing => ({
-                      name: ing.name || '', baseAmount: ing.baseAmount || '', unit: ing.unit || '', volAmount: ing.volAmount || '', volUnit: ing.volUnit || '', group: ing.group || ''
-                  })));
+                  setIngredients(editData.variation.ingredients);
                   setSteps(editData.variation.steps);
                   setNotes(editData.variation.notes ? editData.variation.notes.join('\n') : '');
                   setSource(editData.variation.source || '');
@@ -1192,7 +1217,7 @@
 
              setFoodName(food.name + ' (Copy)'); setVarName(variation.name); setBaseYield(variation.baseYield); setYieldUnit(variation.yieldUnit || 'portions');
              setNotes(variation.notes ? variation.notes.join('\n') : ''); setSource(variation.source || '');
-             setIngredients(variation.ingredients.map(ing => ({ name: ing.name || '', baseAmount: ing.baseAmount || '', unit: ing.unit || '', volAmount: ing.volAmount || '', volUnit: ing.volUnit || '', group: ing.group || '' })));
+             setIngredients(variation.ingredients.map(ing => ({ name: ing.name, baseAmount: ing.baseAmount, unit: ing.unit, volAmount: ing.volAmount || '', volUnit: ing.volUnit || '', group: ing.group || '' })));
              setSteps([...variation.steps]);
           };
 
@@ -1230,7 +1255,7 @@
                   baseAmount: parseFloat(ing.baseAmount), 
                   unit: ing.unit, 
                   volAmount: ing.volAmount ? parseFloat(ing.volAmount) : undefined, 
-                  volUnit: (ing.volUnit || '').trim() || undefined, 
+                  volUnit: ing.volUnit || undefined, 
                   group: (ing.group || '').trim() || undefined
                 })).filter(ing => ing.name && !isNaN(ing.baseAmount)),
                 steps: steps.filter(s => (s || '').trim() !== '')
@@ -1447,6 +1472,7 @@
           const [draggedId, setDraggedId] = useState(null);
           const [dragOverId, setDragOverId] = useState(null);
           const [checkedIngs, setCheckedIngs] = useState({});
+          const [hideCompleted, setHideCompleted] = useState(false);
 
           useEffect(() => setCheckedIngs({}), [variation?.id]);
 
@@ -1586,7 +1612,19 @@
                 </div>
               )}
               
-              <h3 className="text-xl font-display font-extrabold text-stone-800 tracking-tight mb-4">Ingredients</h3>
+              <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-display font-extrabold text-stone-800 tracking-tight">Ingredients</h3>
+                  {checkedList.length > 0 && (
+                      <button 
+                          onClick={() => setHideCompleted(!hideCompleted)} 
+                          className="text-[0.8rem] font-sans font-bold text-stone-500 hover:text-stone-700 bg-stone-100 hover:bg-stone-200 px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5 active:scale-95"
+                      >
+                          <i className={`fa-solid ${hideCompleted ? 'fa-eye' : 'fa-eye-slash'}`}></i>
+                          {hideCompleted ? 'Show checked' : 'Hide checked'}
+                      </button>
+                  )}
+              </div>
+
               <div className="bg-white rounded-[1.25rem] shadow-sm border border-stone-200 overflow-hidden mb-8">
                 {Object.entries(ingredientGroups).map(([groupName, ings], gIdx) => (
                   <React.Fragment key={gIdx}>
@@ -1601,7 +1639,7 @@
                   </React.Fragment>
                 ))}
 
-                {checkedList.length > 0 && (
+                {(!hideCompleted && checkedList.length > 0) && (
                   <React.Fragment>
                      <div className="bg-stone-100 px-4 py-2.5 border-y border-stone-200 flex items-center">
                        <span className="font-sans font-bold text-stone-400 text-xs uppercase tracking-wider">Checked</span>
@@ -1669,9 +1707,16 @@
 
                     let mergedMenu = defaultMenu.map(initialCat => {
                        const savedCat = parsed.menu?.find(c => c.id === initialCat.id);
-                       let subcats = initialCat.subcategories.map(sub => ({
-                           ...sub, foods: sub.foods.filter(f => !trashIds.includes(f.id))
-                       }));
+                       let subcats = initialCat.subcategories.map(initialSub => {
+                           const savedSub = savedCat?.subcategories?.find(s => s.id === initialSub.id);
+                           const mergedFoods = [...initialSub.foods];
+                           if (savedSub) {
+                               savedSub.foods.forEach(f => {
+                                   if (!mergedFoods.find(mf => mf.id === f.id)) mergedFoods.push(f);
+                               });
+                           }
+                           return { ...initialSub, foods: mergedFoods.filter(f => !trashIds.includes(f.id)) };
+                       });
 
                        if (savedCat) {
                            savedCat.subcategories?.forEach(sSub => {
@@ -1683,7 +1728,6 @@
                        return { ...initialCat, subcategories: subcats.filter(sub => sub.foods && sub.foods.length > 0) };
                     });
 
-                    // Auto-migrate Gabriel's Bolo Crucial back to Kids' Creations if needed
                     const dessertsCat = mergedMenu.find(c => c.id === 'desserts');
                     if (dessertsCat) {
                         let myRecipes = dessertsCat.subcategories.find(s => s.id === 'my-recipes');
@@ -1717,20 +1761,19 @@
                         });
                     }
 
-                    let updates = parsed.latestUpdates || defaultDiscover;
-                    // Force a one-time Discover page reset if they are on an old version (to show new recipes)
-                    if (!parsed.version || parsed.version < CURRENT_APP_VERSION) {
-                        updates = defaultDiscover;
+                    let initUpdates = parsed.latestUpdates || defaultDiscover;
+                    if (parsed.appVersion !== '3.4') {
+                        initUpdates = defaultDiscover; 
                     }
 
-                    return { recipes: mergedRecipes, menu: mergedMenu, latestUpdates: updates, trash: parsed.trash || [], version: CURRENT_APP_VERSION };
+                    return { recipes: mergedRecipes, menu: mergedMenu, latestUpdates: initUpdates, trash: parsed.trash || [], appVersion: '3.4' };
                 }
             } catch (error) { console.error("Failed to parse Local Storage", error); }
             
             const initialCleanMenu = defaultMenu.map(cat => ({
                 ...cat, subcategories: cat.subcategories.filter(sub => sub.foods && sub.foods.length > 0)
             }));
-            return { menu: initialCleanMenu, recipes: defaultRecipes, latestUpdates: defaultDiscover, trash: [], version: CURRENT_APP_VERSION };
+            return { menu: initialCleanMenu, recipes: defaultRecipes, latestUpdates: defaultDiscover, trash: [], appVersion: '3.4' };
           });
           
           const [favourites, setFavourites] = useState(() => { try { return JSON.parse(localStorage.getItem('foodMakerFavs')) || []; } catch(e) { return []; } }); 
@@ -1762,49 +1805,41 @@
                       let decodedStr;
                       if (window.LZString) {
                           decodedStr = window.LZString.decompressFromEncodedURIComponent(importStr);
-                      } else {
-                          try { decodedStr = decodeURIComponent(atob(importStr)); } catch (e) {
-                              try { decodedStr = decodeURIComponent(escape(atob(decodeURIComponent(importStr)))); } catch(e2) {}
+                      }
+                      
+                      if (!decodedStr) {
+                          try {
+                              decodedStr = decodeURIComponent(atob(importStr));
+                          } catch (e) {
+                              try {
+                                  decodedStr = decodeURIComponent(escape(atob(decodeURIComponent(importStr))));
+                              } catch(e2) {}
                           }
                       }
                       
                       if (!decodedStr) throw new Error("Could not decode share link");
                       
-                      const decodedData = JSON.parse(decodedStr);
-                      let newFood = null;
-
-                      if (decodedData.p) {
-                          // Unpack extremely minified recipe data
-                          const p = decodedData.p;
-                          newFood = {
-                              id: 'shared-' + Date.now(),
-                              name: p.n + ' (Shared)',
-                              categoryId: p.c,
-                              isCustom: true,
-                              variations: [{
-                                  id: 'var-' + Date.now(),
-                                  name: p.v.n,
-                                  description: p.v.d,
-                                  baseYield: p.v.y,
-                                  yieldUnit: p.v.u,
-                                  ingredients: p.v.i.map((ig, idx) => ({
-                                      id: 'ing-' + idx,
-                                      name: ig[0], baseAmount: ig[1], unit: ig[2],
-                                      volAmount: ig[3] !== '' ? parseFloat(ig[3]) : undefined,
-                                      volUnit: ig[4] !== '' ? ig[4] : undefined,
-                                      group: ig[5] !== '' ? ig[5] : undefined
-                                  })),
-                                  steps: p.v.s,
-                                  notes: p.v.nt,
-                                  source: p.v.sr
-                              }]
+                      let decodedData = JSON.parse(decodedStr);
+                      
+                      if (decodedData.f && decodedData.v) {
+                          decodedData = {
+                              food: {
+                                  id: decodedData.f.i, name: decodedData.f.n, isCustom: true, categoryId: decodedData.f.c,
+                                  variations: [{
+                                      id: decodedData.v.i, name: decodedData.v.n, description: decodedData.v.d,
+                                      baseYield: decodedData.v.y, yieldUnit: decodedData.v.u,
+                                      ingredients: decodedData.v.ig.map((ig, idx) => ({
+                                          id: `ing-${idx}`, name: ig[0], baseAmount: ig[1], unit: ig[2], volAmount: ig[3], volUnit: ig[4], group: ig[5]
+                                      })),
+                                      steps: decodedData.v.s, notes: decodedData.v.nt, source: decodedData.v.src
+                                  }]
+                              }
                           };
-                      } else if (decodedData.food) {
-                          // Fallback for older share links
-                          newFood = { ...decodedData.food, id: decodedData.food.id + '-' + Date.now(), name: decodedData.food.name + ' (Shared)', isCustom: true };
                       }
 
-                      if (newFood) setImportPrompt(newFood);
+                      if (decodedData && decodedData.food) {
+                          setImportPrompt(decodedData.food);
+                      }
                       window.history.replaceState({}, document.title, window.location.pathname);
                   } catch (e) {
                       console.error("Import failed:", e);
@@ -1927,27 +1962,20 @@
              const variation = food.variations.find(v => v.id === variationId);
              const title = `${food.name} - ${variation.name}`;
              
-             // Extreme minification mapping to reduce string length
-             const packed = {
-                 n: food.name,
-                 c: food.categoryId || 'snacks',
+             const minifiedData = {
+                 f: { i: food.id, n: food.name, c: food.categoryId },
                  v: {
-                     n: variation.name,
-                     d: variation.description || '',
-                     y: variation.baseYield,
-                     u: variation.yieldUnit,
-                     i: variation.ingredients.map(ig => [ig.name, ig.baseAmount, ig.unit, ig.volAmount||'', ig.volUnit||'', ig.group||'']),
-                     s: variation.steps,
-                     nt: variation.notes || [],
-                     sr: variation.source || ''
+                     i: variation.id, n: variation.name, d: variation.description, y: variation.baseYield, u: variation.yieldUnit,
+                     ig: variation.ingredients.map(ig => [ig.name, ig.baseAmount, ig.unit, ig.volAmount, ig.volUnit, ig.group]),
+                     s: variation.steps, nt: variation.notes, src: variation.source
                  }
              };
 
              let encoded;
              if (window.LZString) {
-                 encoded = window.LZString.compressToEncodedURIComponent(JSON.stringify({p: packed}));
+                 encoded = window.LZString.compressToEncodedURIComponent(JSON.stringify(minifiedData));
              } else {
-                 encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify({p: packed})))));
+                 encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(minifiedData)))));
              }
              
              const shareUrl = `${window.location.origin}${window.location.pathname}?share=${encoded}`;
