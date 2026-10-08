@@ -1790,7 +1790,11 @@
                         if (!trashIds.includes(key)) {
                             mergedRecipes[key] = { ...defaultRecipes[key] };
                             if (parsed.recipes && parsed.recipes[key] && !parsed.recipes[key].isCustom) {
-                                mergedRecipes[key].variations = parsed.recipes[key].variations;
+                                if (key === 'bolo-luiz-felipe') {
+                                    mergedRecipes[key].variations = defaultRecipes[key].variations;
+                                } else {
+                                    mergedRecipes[key].variations = parsed.recipes[key].variations;
+                                }
                             }
                         }
                     });
@@ -1802,18 +1806,18 @@
                     }
 
                     let initUpdates = parsed.latestUpdates || defaultDiscover;
-                    if (parsed.appVersion !== '3.6') {
+                    if (parsed.appVersion !== '3.7') {
                         initUpdates = defaultDiscover; 
                     }
 
-                    return { recipes: mergedRecipes, menu: mergedMenu, latestUpdates: initUpdates, trash: parsed.trash || [], appVersion: '3.6' };
+                    return { recipes: mergedRecipes, menu: mergedMenu, latestUpdates: initUpdates, trash: parsed.trash || [], appVersion: '3.7' };
                 }
             } catch (error) { console.error("Failed to parse Local Storage", error); }
             
             const initialCleanMenu = defaultMenu.map(cat => ({
                 ...cat, subcategories: cat.subcategories.filter(sub => sub.foods && sub.foods.length > 0)
             }));
-            return { menu: initialCleanMenu, recipes: defaultRecipes, latestUpdates: defaultDiscover, trash: [], appVersion: '3.6' };
+            return { menu: initialCleanMenu, recipes: defaultRecipes, latestUpdates: defaultDiscover, trash: [], appVersion: '3.7' };
           });
           
           const [favourites, setFavourites] = useState(() => { try { return JSON.parse(localStorage.getItem('foodMakerFavs')) || []; } catch(e) { return []; } }); 
