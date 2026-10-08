@@ -98,7 +98,7 @@
             ] },
             { id: "veggies", name: "Veggies", subcategories: [] },
             { id: "desserts", name: "Desserts", subcategories: [
-                { id: "cakes", name: "Cakes", foods: [{ id: "cinnamon-apple-cake", name: "Cinnamon Apple Cake" }, { id: "bolo-luiz-felipe", name: "Bolo Luiz Felipe" }] },
+                { id: "cakes", name: "Cakes", foods: [{ id: "cinnamon-apple-cake", name: "Cinnamon Apple Cake" }, { id: "bolo-luiz-felipe", name: "Bolo Luiz Felipe" }, { id: "dianas-banana-cake", name: "Diana's Banana Cake" }] },
                 { id: "kids-creations", name: "Kids' Creations", foods: [{ id: "gabriels-bolo-crucial", name: "Gabriel's Bolo Crucial" }] },
                 { id: "brownies", name: "Brownies", foods: [{ id: "brownies", name: "Brownies" }] }
               ] 
@@ -127,23 +127,52 @@
                   id: "rachel-de-queiroz", name: "By Rachel de Queiroz", description: "A famous Brazilian dense cake (bolo mole) based on cheese, coconut milk, and butter.",
                   baseYield: 12, yieldUnit: "slices", source: "http://enfiandoacolher.blogspot.com/2011/01/bolo-luiz-felipe-by-escritora-rachel-de.html",
                   ingredients: [
-                    { id: "gemas", name: "Gemas", baseAmount: 10, unit: "units" },
-                    { id: "claras", name: "Claras", baseAmount: 4, unit: "units" },
-                    { id: "acucar", name: "Açúcar", baseAmount: 1000, unit: "g", volAmount: 5, volUnit: "xícaras" },
-                    { id: "farinha", name: "Farinha de trigo peneirada", baseAmount: 300, unit: "g", volAmount: 2.5, volUnit: "xícaras" },
-                    { id: "queijo", name: "Queijo ralado (coalho ou reino)", baseAmount: 100, unit: "g", volAmount: 1, volUnit: "pires cheio" },
-                    { id: "manteiga", name: "Manteiga", baseAmount: 400, unit: "g", volAmount: 2, volUnit: "xícaras" },
-                    { id: "leite-coco", name: "Leite de coco (fresco de preferência)", baseAmount: 200, unit: "ml", volAmount: 1, volUnit: "copo" }
+                    { id: "egg-yolks", name: "Egg yolks", baseAmount: 10, unit: "units" },
+                    { id: "egg-whites", name: "Egg whites", baseAmount: 4, unit: "units" },
+                    { id: "sugar", name: "Sugar", baseAmount: 1000, unit: "g", volAmount: 5, volUnit: "cups" },
+                    { id: "flour", name: "All-purpose flour (sifted)", baseAmount: 300, unit: "g", volAmount: 2.5, volUnit: "cups" },
+                    { id: "cheese", name: "Grated firm cheese (Coalho or Edam)", baseAmount: 100, unit: "g", volAmount: 1, volUnit: "cup" },
+                    { id: "butter", name: "Butter", baseAmount: 400, unit: "g", volAmount: 2, volUnit: "cups" },
+                    { id: "coconut-milk", name: "Coconut milk (preferably fresh)", baseAmount: 200, unit: "ml", volAmount: 1, volUnit: "cup" }
                   ],
                   steps: [
-                    "Bata bem as gemas.",
-                    "Bata bem as claras em neve (separadas das gemas).",
-                    "Enquanto isso faça uma calda com o açúcar, mas sem deixar escurecer.",
-                    "Com a calda fervente, tire-a do fogo e junte as gemas e mexa vigorosamente.",
-                    "Em seguida, junte as claras e continue mexendo sem parar, enquanto acrescenta o leite de coco, a manteiga, o queijo e por último a farinha de trigo bem peneirada e ao poucos.",
-                    "Besunte uma forma com manteiga e enfarinhe-a.",
-                    "Ponha a massa na forma e leve-a ao forno bem quente (180ºC) por 45min. Até ele dourar por cima.",
-                    "Para que o bolo não murche, deixe-o esfriar dentro do forno."
+                    "Beat the egg yolks well in a bowl.",
+                    "In a separate bowl, beat the egg whites until stiff peaks form.",
+                    "Meanwhile, make a simple syrup with the sugar (adding a little water if necessary to melt), being careful not to let it brown or darken.",
+                    "Remove the boiling syrup from the heat, quickly add the beaten egg yolks, and stir vigorously to incorporate.",
+                    "Next, fold in the egg whites and continue stirring constantly while adding the coconut milk, butter, grated cheese, and finally, the sifted flour, little by little.",
+                    "Grease a baking pan generously with butter and coat it with flour.",
+                    "Pour the batter into the pan and bake in a hot oven (350°F / 180°C) for 45 minutes, or until the top is golden brown.",
+                    "To prevent the cake from falling, let it cool completely inside the oven before removing."
+                  ]
+                }
+              ]
+            },
+            "dianas-banana-cake": {
+              id: "dianas-banana-cake", name: "Diana's Banana Cake", isCustom: false, categoryId: "desserts",
+              variations: [
+                {
+                  id: "sugar-free", name: "Sugar-Free (with Raisins)", description: "A delicious, sugar-free, wheat-free banana cake. Easy to make and a hit with babies, kids, and adults!",
+                  baseYield: 15, yieldUnit: "portions",
+                  ingredients: [
+                    { id: "bananas", name: "Bananas", baseAmount: 4, unit: "units" },
+                    { id: "eggs", name: "Eggs", baseAmount: 4, unit: "units" },
+                    { id: "raisins", name: "Raisins (or brown sugar)", baseAmount: 150, unit: "g", volAmount: 1, volUnit: "cup" },
+                    { id: "oil", name: "Oil (of your choice)", baseAmount: 120, unit: "ml", volAmount: 0.5, volUnit: "cup" },
+                    { id: "oat-bran", name: "Oat bran", baseAmount: 100, unit: "g", volAmount: 1, volUnit: "cup" },
+                    { id: "quick-oats", name: "Quick oats (fine rolled oats)", baseAmount: 100, unit: "g", volAmount: 1, volUnit: "cup" },
+                    { id: "cinnamon", name: "Cinnamon", baseAmount: 2, unit: "g", volAmount: 1, volUnit: "tsp" },
+                    { id: "baking-powder", name: "Baking powder", baseAmount: 28, unit: "g", volAmount: 2, volUnit: "tbsp" }
+                  ],
+                  steps: [
+                    "Blend the bananas, eggs, raisins (or brown sugar), and oil in a blender until completely smooth.",
+                    "Pour the blended mixture into a large bowl and stir in the oat bran, quick oats, cinnamon, and baking powder.",
+                    "Pour the batter into greased and floured muffin tins, or a small cake pan.",
+                    "Bake at 350°F (180°C) for about 30 minutes, or until a toothpick inserted in the centre comes out clean."
+                  ],
+                  notes: [
+                    "This recipe yields a large amount (about 10 cupcakes and 1 small cake). You can halve the recipe if you prefer.",
+                    "These can be frozen. To thaw, simply leave them at room temperature or microwave for about 30 seconds."
                   ]
                 }
               ]
@@ -608,14 +637,14 @@
         };
 
         const defaultDiscover = [
-            { id: '1', type: 'food', foodId: 'bolo-luiz-felipe', title: 'Bolo Luiz Felipe', categoryId: 'desserts' },
-            { id: '2', type: 'food', foodId: 'rice-paper-sushi-rolls', title: 'Rice Paper Sushi Rolls', categoryId: 'rice' },
-            { id: '3', type: 'food', foodId: 'italian-penicillin-soup', title: 'Italian Penicillin Soup', categoryId: 'pasta' },
-            { id: '4', type: 'food', foodId: 'mushroom-creamy-gnocchi', title: 'Mushroom Creamy Gnocchi', categoryId: 'pasta' },
-            { id: '5', type: 'food', foodId: 'pao-de-queijo', title: 'Pão de Queijo', categoryId: 'snacks' },
+            { id: '1', type: 'food', foodId: 'dianas-banana-cake', title: 'Diana\'s Banana Cake', categoryId: 'desserts' },
+            { id: '2', type: 'food', foodId: 'bolo-luiz-felipe', title: 'Bolo Luiz Felipe', categoryId: 'desserts' },
+            { id: '3', type: 'food', foodId: 'rice-paper-sushi-rolls', title: 'Rice Paper Sushi Rolls', categoryId: 'rice' },
+            { id: '4', type: 'food', foodId: 'italian-penicillin-soup', title: 'Italian Penicillin Soup', categoryId: 'pasta' },
+            { id: '5', type: 'food', foodId: 'mushroom-creamy-gnocchi', title: 'Mushroom Creamy Gnocchi', categoryId: 'pasta' },
             { id: '6', type: 'food', foodId: 'gabriels-bolo-crucial', title: 'Gabriel\'s Bolo Crucial', categoryId: 'desserts' },
-            { id: '7', type: 'food', foodId: 'burger-patty', title: 'Umami Burger Patty', categoryId: 'bbq' },
-            { id: '8', type: 'food', foodId: 'caipirinha-plus', title: 'Caipirinha+', categoryId: 'drinks' }
+            { id: '7', type: 'food', foodId: 'pao-de-queijo', title: 'Pão de Queijo', categoryId: 'snacks' },
+            { id: '8', type: 'food', foodId: 'burger-patty', title: 'Umami Burger Patty', categoryId: 'bbq' }
         ];
 
         const SwipeableItem = ({ children, onDelete }) => {
@@ -1742,6 +1771,17 @@
                                 kids.foods.push({ id: 'gabriels-bolo-crucial', name: "Gabriel's Bolo Crucial" });
                             }
                         }
+                        
+                        let kidsCreations = dessertsCat.subcategories.find(s => s.id === 'kids-creations');
+                        if (kidsCreations && kidsCreations.foods.some(f => f.id === 'dianas-banana-cake')) {
+                            kidsCreations.foods = kidsCreations.foods.filter(f => f.id !== 'dianas-banana-cake');
+                        }
+                        
+                        let cakesSub = dessertsCat.subcategories.find(s => s.id === 'cakes');
+                        if (cakesSub && !cakesSub.foods.some(f => f.id === 'dianas-banana-cake') && !trashIds.includes('dianas-banana-cake')) {
+                            cakesSub.foods.push({ id: 'dianas-banana-cake', name: "Diana's Banana Cake" });
+                        }
+
                         dessertsCat.subcategories = dessertsCat.subcategories.filter(s => s.foods.length > 0);
                     }
 
@@ -1762,18 +1802,18 @@
                     }
 
                     let initUpdates = parsed.latestUpdates || defaultDiscover;
-                    if (parsed.appVersion !== '3.4') {
+                    if (parsed.appVersion !== '3.6') {
                         initUpdates = defaultDiscover; 
                     }
 
-                    return { recipes: mergedRecipes, menu: mergedMenu, latestUpdates: initUpdates, trash: parsed.trash || [], appVersion: '3.4' };
+                    return { recipes: mergedRecipes, menu: mergedMenu, latestUpdates: initUpdates, trash: parsed.trash || [], appVersion: '3.6' };
                 }
             } catch (error) { console.error("Failed to parse Local Storage", error); }
             
             const initialCleanMenu = defaultMenu.map(cat => ({
                 ...cat, subcategories: cat.subcategories.filter(sub => sub.foods && sub.foods.length > 0)
             }));
-            return { menu: initialCleanMenu, recipes: defaultRecipes, latestUpdates: defaultDiscover, trash: [], appVersion: '3.4' };
+            return { menu: initialCleanMenu, recipes: defaultRecipes, latestUpdates: defaultDiscover, trash: [], appVersion: '3.6' };
           });
           
           const [favourites, setFavourites] = useState(() => { try { return JSON.parse(localStorage.getItem('foodMakerFavs')) || []; } catch(e) { return []; } }); 
