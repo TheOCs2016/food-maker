@@ -87,7 +87,10 @@
         };
 
         const defaultMenu = [
-            { id: "snacks", name: "Snacks", subcategories: [{ id: "br-snacks", name: "Brazilian Snacks", foods: [{ id: "pao-de-queijo", name: "Pão de Queijo" }] }] },
+            { id: "snacks", name: "Snacks", subcategories: [
+                { id: "br-snacks", name: "Brazilian Snacks", foods: [{ id: "pao-de-queijo", name: "Pão de Queijo" }] },
+                { id: "dips", name: "Dips", foods: [{ id: "easy-spinach-dip", name: "Easy Spinach Dip" }] }
+            ] },
             { id: "bread", name: "Bread", subcategories: [] },
             { id: "rice", name: "Rice", subcategories: [{ id: "sushi", name: "Sushi", foods: [{ id: "rice-paper-sushi-rolls", name: "Rice Paper Sushi Rolls" }] }] },
             { id: "chicken", name: "Chicken", subcategories: [] },
@@ -120,6 +123,33 @@
         ];
 
         const defaultRecipes = {
+            "easy-spinach-dip": {
+              id: "easy-spinach-dip", name: "Easy Spinach Dip", isCustom: false, categoryId: "snacks",
+              variations: [
+                {
+                  id: "classic", name: "Classic Baked", description: "A creamy, cheesy, and easy baked spinach dip. Perfect with tortilla chips.",
+                  baseYield: 6, yieldUnit: "portions", source: "https://www.instagram.com/reel/CvGZU7eN0OW/?mdxt=MWxsZ3YyZmtmdHF3YQ%3D%3D",
+                  ingredients: [
+                    { id: "cream-cheese", name: "Cream cheese (room temp)", baseAmount: 375, unit: "g", volAmount: 13.2, volUnit: "oz" },
+                    { id: "sour-cream", name: "Sour cream", baseAmount: 15, unit: "ml", volAmount: 1, volUnit: "tbsp" },
+                    { id: "spinach", name: "Spinach (rinsed and cleaned)", baseAmount: 2, unit: "handful" },
+                    { id: "garlic-powder", name: "Garlic powder", baseAmount: 3, unit: "g", volAmount: 1, volUnit: "tsp" },
+                    { id: "salt-pepper", name: "Salt & pepper", baseAmount: 3, unit: "g", volAmount: 1, volUnit: "tsp" },
+                    { id: "paprika", name: "Paprika", baseAmount: 3, unit: "g", volAmount: 1, volUnit: "tsp" },
+                    { id: "parmesan", name: "Parmesan cheese", baseAmount: 50, unit: "g", volAmount: 0.5, volUnit: "cup" },
+                    { id: "mozzarella", name: "Mozzarella cheese", baseAmount: 100, unit: "g", volAmount: 1, volUnit: "cup" }
+                  ],
+                  steps: [
+                    "Make sure you WASH your spinach off.",
+                    "Add all the ingredients (except the mozzarella) to one pan and mix thoroughly together.",
+                    "Add your mozzarella cheese on top.",
+                    "Set your oven to 350°F (175°C) and bake for 15 minutes.",
+                    "Broil for 30 seconds on high to get a crusted top.",
+                    "Let cool slightly and enjoy! (Goes great with tortilla chips)."
+                  ]
+                }
+              ]
+            },
             "bolo-luiz-felipe": {
               id: "bolo-luiz-felipe", name: "Bolo Luiz Felipe", isCustom: false, categoryId: "desserts",
               variations: [
@@ -637,12 +667,12 @@
         };
 
         const defaultDiscover = [
-            { id: '1', type: 'food', foodId: 'dianas-banana-cake', title: 'Diana\'s Banana Cake', categoryId: 'desserts' },
-            { id: '2', type: 'food', foodId: 'bolo-luiz-felipe', title: 'Bolo Luiz Felipe', categoryId: 'desserts' },
-            { id: '3', type: 'food', foodId: 'rice-paper-sushi-rolls', title: 'Rice Paper Sushi Rolls', categoryId: 'rice' },
-            { id: '4', type: 'food', foodId: 'italian-penicillin-soup', title: 'Italian Penicillin Soup', categoryId: 'pasta' },
-            { id: '5', type: 'food', foodId: 'mushroom-creamy-gnocchi', title: 'Mushroom Creamy Gnocchi', categoryId: 'pasta' },
-            { id: '6', type: 'food', foodId: 'gabriels-bolo-crucial', title: 'Gabriel\'s Bolo Crucial', categoryId: 'desserts' },
+            { id: '1', type: 'food', foodId: 'easy-spinach-dip', title: 'Easy Spinach Dip', categoryId: 'snacks' },
+            { id: '2', type: 'food', foodId: 'dianas-banana-cake', title: 'Diana\'s Banana Cake', categoryId: 'desserts' },
+            { id: '3', type: 'food', foodId: 'bolo-luiz-felipe', title: 'Bolo Luiz Felipe', categoryId: 'desserts' },
+            { id: '4', type: 'food', foodId: 'rice-paper-sushi-rolls', title: 'Rice Paper Sushi Rolls', categoryId: 'rice' },
+            { id: '5', type: 'food', foodId: 'italian-penicillin-soup', title: 'Italian Penicillin Soup', categoryId: 'pasta' },
+            { id: '6', type: 'food', foodId: 'mushroom-creamy-gnocchi', title: 'Mushroom Creamy Gnocchi', categoryId: 'pasta' },
             { id: '7', type: 'food', foodId: 'pao-de-queijo', title: 'Pão de Queijo', categoryId: 'snacks' },
             { id: '8', type: 'food', foodId: 'burger-patty', title: 'Umami Burger Patty', categoryId: 'bbq' }
         ];
@@ -1790,7 +1820,7 @@
                         if (!trashIds.includes(key)) {
                             mergedRecipes[key] = { ...defaultRecipes[key] };
                             if (parsed.recipes && parsed.recipes[key] && !parsed.recipes[key].isCustom) {
-                                if (key === 'bolo-luiz-felipe') {
+                                if (key === 'bolo-luiz-felipe' || key === 'easy-spinach-dip') {
                                     mergedRecipes[key].variations = defaultRecipes[key].variations;
                                 } else {
                                     mergedRecipes[key].variations = parsed.recipes[key].variations;
@@ -1806,18 +1836,18 @@
                     }
 
                     let initUpdates = parsed.latestUpdates || defaultDiscover;
-                    if (parsed.appVersion !== '3.7') {
+                    if (parsed.appVersion !== '3.8') {
                         initUpdates = defaultDiscover; 
                     }
 
-                    return { recipes: mergedRecipes, menu: mergedMenu, latestUpdates: initUpdates, trash: parsed.trash || [], appVersion: '3.7' };
+                    return { recipes: mergedRecipes, menu: mergedMenu, latestUpdates: initUpdates, trash: parsed.trash || [], appVersion: '3.8' };
                 }
             } catch (error) { console.error("Failed to parse Local Storage", error); }
             
             const initialCleanMenu = defaultMenu.map(cat => ({
                 ...cat, subcategories: cat.subcategories.filter(sub => sub.foods && sub.foods.length > 0)
             }));
-            return { menu: initialCleanMenu, recipes: defaultRecipes, latestUpdates: defaultDiscover, trash: [], appVersion: '3.7' };
+            return { menu: initialCleanMenu, recipes: defaultRecipes, latestUpdates: defaultDiscover, trash: [], appVersion: '3.8' };
           });
           
           const [favourites, setFavourites] = useState(() => { try { return JSON.parse(localStorage.getItem('foodMakerFavs')) || []; } catch(e) { return []; } }); 
